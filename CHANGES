@@ -1,0 +1,17 @@
+v2.2alpha - 2011-03-11
+
+	* create development repository https://github.com/mhaller/pyffmpeg 
+	  with PyFFmpeg version 2.1 beta as initial version
+	  (http://pyffmpeg.googlecode.com/files/pyffmpeg-2.1beta.tar.gz) 
+
+	* updating README file, changing version number for PyFFmpeg to 2.2alpha,
+	  update setup.py and pyffmpeg.pyx for current FFmpeg checkout (see version details in README)
+
+	* new functions are 
+		get_current_frame_macroblock_types
+		get_current_frame_motion_vectors
+		get_current_frame_reference_index
+
+	* libavformat/avio.h has changed noticeable
+
+	* add testInstalledPyFFmpeg.py and test.mp4 as test case 

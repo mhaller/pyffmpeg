@@ -6,9 +6,7 @@ from Cython.Distutils import build_ext
 from os.path import join as path_join
 from sys import platform
 
-
-
-
+##################################################################################
 try:
   import numpy.distutils.misc_util as nd
   with_numpy=True
@@ -17,11 +15,9 @@ except:
   sys.stderr.write("Numpy does not seems to be installed on your system.\n")
   sys.stderr.write("You may still use pyffmpeg but audiosupport and numpy-bridge are disabled.\n")  
 
-
-
-
+##################################################################################
 ## Try to locate source if necessary
-if platform == 'win32':
+if platform in [ 'win32', 'win64' ] :
     ffmpegpath = r'c:\ffmpeg'
     for x in [ r'..\ffmpeg',  r'c:\ffmpeg-static', r'c:\ffmpeg' ]:
         try:
@@ -32,8 +28,8 @@ if platform == 'win32':
     extra_compiler_args=["-static-libgcc"]
     
 else:
-    ffmpegpath = '/opt/ffmpeg'
-    for x in [ os.environ["HOME"]+"build/ffmpeg",  '/usr/local/ffmpeg',  '/opt/ffmpeg' ]:
+    ffmpegpath = '/opt/codecs'
+    for x in [ os.environ["HOME"]+"build/ffmpeg",  '/usr/local/ffmpeg',  '/opt/codecs',   '/opt/ffmpeg']:
         try:
              os.stat(x)
              ffmpegpath = x
@@ -41,7 +37,7 @@ else:
             pass    
     extra_compiler_args=[]
 
-
+##################################################################################
 # Try to resove
 # static dependencies resolution by looking into pkgconfig files
 def static_resolver(libs):
@@ -69,18 +65,23 @@ def static_resolver(libs):
     map(lambda x: x not in result and result.append(x), deps)
     return result
 
-
-libs = [ 'avformat', 'avcodec', 'avutil', 'swscale' ]
-incdir = [ path_join(ffmpegpath, 'include'), "/usr/include/ffmpeg" , "./include" ] 
-
-if (with_numpy):
-  incdir = incdir + list(nd.get_numpy_include_dirs())
 libinc = [ path_join(ffmpegpath, 'lib') ]
 
 if platform in [ 'win32', 'win64' ] :
+
     libs = static_resolver(libs)
     libinc += [ r'/mingw/lib' ] # it seems some people require this
+    incdir = path_join(ffmpegpath, 'include') 
 
+else:
+
+    libs = [ 'avformat', 'avcodec', 'avutil', 'swscale' ]
+    incdir = [ path_join(ffmpegpath, 'include'), "/usr/include" , "./include" ] 
+
+if (with_numpy):
+  incdir = incdir + list(nd.get_numpy_include_dirs())
+
+##################################################################################
 if with_numpy:
         ext_modules=[ Extension('pyffmpeg', [ 'pyffmpeg.pyx' ],
                        include_dirs = incdir,
@@ -106,10 +107,10 @@ else:
                        extra_compile_args=extra_compiler_args)
                     ]
 
-
+##################################################################################
 setup(
     name = 'pyffmpeg',
     cmdclass = {'build_ext': build_ext},
-    version = "2.1beta",
+    version = "2.2alpha",
     ext_modules = ext_modules
 )

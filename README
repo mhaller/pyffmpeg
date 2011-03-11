@@ -1,0 +1,51 @@
+*** This is an unofficial development repository for PyFFmpeg. ***
+
+Official project releases can be found at http://code.google.com/p/pyffmpeg/downloads/list
+
+This is an extended version of PyFFmpeg with support for the current FFmpeg version 
+and it is based on PyFFmpeg version 2.1 beta (see the link above). Adding additional 
+functionality is ongoing work. Thus, your feedback is welcome at <martin.haller@computer.org>.
+
+This PyFFmpeg version has been test with ...
+
+	Python
+
+		Python 2.6.6
+
+	Cython
+
+		Cython 0.14.1
+
+	FFmpeg (git://git.ffmpeg.org/ffmpeg.git)
+
+		FFmpeg version git-35d7d6f 
+		(http://git.ffmpeg.org/?p=ffmpeg.git;a=snapshot;h=35d7d6f7489c75aaa2fcb39820fb25b0fd44524b;sf=tgz)
+		with its libraries 
+			libavutil    50. 39. 0 
+			libavcodec   52.113. 2 
+			libavformat  52.102. 0 
+			libavdevice  52.  2. 3 
+			libavfilter   1. 76. 0 
+			libswscale    0. 12. 0 
+
+	Operating System
+
+		Windows (mingw)
+		MacOS X 10.6.6
+		Unix
+
+You can install and test PyFFmpeg as follows:
+
+	1. Edit setup.py and adapt ffmpegpath to your configuration
+
+	2. Execute "sudo python setup.py install" 
+
+	3. Check if PyFFmpeg is working using the testInstalledPyFFmpeg.py file
+
+Please report issues as well as configuration details for your working 
+PyFFmpeg installations at <martin.haller@computer.org>
+
+ 
+
+
+
