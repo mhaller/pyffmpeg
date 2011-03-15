@@ -3293,7 +3293,7 @@ cdef class FFMpegReader(AFFMpegReader):
         self.filename = filename
         self.FormatCtx = avformat_alloc_context()
 
-        #if (mode=="w"):
+        if (mode=="w"):
             raise Exception,"Not yet supported sorry"
             self.FormatCtx.oformat = av_guess_format(NULL, filename_, NULL)
             if (self.FormatCtx.oformat==NULL):
