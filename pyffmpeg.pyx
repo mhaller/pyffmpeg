@@ -2,7 +2,7 @@
 
 """
 ##################################################################################
-# PyFFmpeg v2.2 alpha
+# PyFFmpeg v2.2 alpha 1
 #
 # Copyright (C) 2011 Martin Haller <martin.haller@computer.org>
 # Copyright (C) 2011 Bertrand Nouvel <bertrand@lm3labs.com>
@@ -1628,9 +1628,10 @@ cdef extern from "libavformat/avformat.h":
         void *              priv_data
         AVIOContext *       pb
         unsigned int        nb_streams
-        AVStream *          streams[MAX_STREAMS]
+        AVStream *          streams[20]        #< MAX_STREAMS == 20
         char                filename[1024]
         int64_t             timestamp
+        int                 ctx_flags        #< Format-specific flags, see AVFMTCTX_xx, private data for pts handling (do not modify directly)
         AVPacketList *      packet_buffer
         int64_t             start_time
         int64_t             duration
@@ -1940,15 +1941,6 @@ except:
 ##################################################################################
 # Utility elements
 ##################################################################################
-cdef __registered
-__registered = 0
-
-
-def py_av_register_all():
-    if __registered:
-        return
-    __registered = 1
-    av_register_all()
 
 
 # original definiton as define in libavutil/avutil.h
@@ -2043,7 +2035,12 @@ except:
 ##################################################################################
 # Initialization
 ##################################################################################
-py_av_register_all()
+
+cdef __registered
+__registered = 0
+if not __registered:
+    __registered = 1
+    av_register_all()
 
 
 ##################################################################################
@@ -2083,7 +2080,6 @@ cdef class AFFMpegReader:
     cdef int altpacket
     #
     cdef bint observers_enabled
-
 
     cdef AVFormatContext *FormatCtx
  #   self.prepacket=<AVPacket *>None
@@ -3246,6 +3242,7 @@ cdef class FFMpegReader(AFFMpegReader):
         self.with_readahead=with_readahead
         self.seek_before_security_interval=seek_before
 
+
     def __dealloc__(self):
         self.tracks=[]
         if (self.FormatCtx!=NULL):
@@ -3258,11 +3255,14 @@ cdef class FFMpegReader(AFFMpegReader):
             av_close_input_file(self.FormatCtx)
             self.FormatCtx=NULL
 
+
     def __del__(self):
         self.close()
 
+
     def dump(self):
         av_dump_format(self.FormatCtx,0,self.filename,0)
+
 
     #def open_old(self,char *filename,track_selector=None,mode="r"):
 
@@ -3280,8 +3280,6 @@ cdef class FFMpegReader(AFFMpegReader):
 #            self.__finalize_open_write()
 
 
-
-
     def open(self,char *filename,track_selector=None,mode="r",buf_size=1024):
         cdef int ret
         cdef int score
@@ -3295,18 +3293,17 @@ cdef class FFMpegReader(AFFMpegReader):
         self.filename = filename
         self.FormatCtx = avformat_alloc_context()
 
-        if (mode=="w"):
+        #if (mode=="w"):
             raise Exception,"Not yet supported sorry"
             self.FormatCtx.oformat = av_guess_format(NULL, filename_, NULL)
             if (self.FormatCtx.oformat==NULL):
                 raise Exception, "Unable to find output format for %s\n"
 
-
-        #self.FormatCtx.priv_data = av_mallocz(self.FormatCtx.oformat.priv_data_size);
         if (fmt==NULL):
             fmt=av_probe_input_format(&pd,0)
+        
         if (fmt==NULL) or (not (fmt.flags & AVFMT_NOFILE)):
-            ret=avio_open(&self.FormatCtx.pb, filename, 0)
+            ret = avio_open(&self.FormatCtx.pb, filename, 0)
             if ret < 0:
                 raise IOError("Unable to open file %s (avio_open)" % filename)
             if (buf_size>0):
@@ -3330,7 +3327,6 @@ cdef class FFMpegReader(AFFMpegReader):
         assert(fmt!=NULL)
         self.FormatCtx.iformat=fmt
 
-
         if (mode=="r"):
             ret = av_open_input_stream(&self.FormatCtx,self.FormatCtx.pb,filename,self.FormatCtx.iformat,NULL)
             if ret != 0:
@@ -3343,8 +3339,6 @@ cdef class FFMpegReader(AFFMpegReader):
             self.__finalize_open_write()
         else:
             raise ValueError, "Unknown Mode"
-
-
 
 
     def __finalize_open_write(self):
@@ -3394,7 +3388,6 @@ cdef class FFMpegReader(AFFMpegReader):
         ret = av_find_stream_info(self.FormatCtx)
         if ret < 0:
             raise IOError("Unable to find Track info: %d" % (ret,))
-
 
         self.pts=0
         self.dts=0
@@ -3473,6 +3466,7 @@ cdef class FFMpegReader(AFFMpegReader):
         except KeyError:
             pass
 
+
     def close(self):
         if (self.FormatCtx!=NULL):
             for s in self.tracks:
@@ -3509,6 +3503,7 @@ cdef class FFMpegReader(AFFMpegReader):
             #if ret < 0:
             raise IOError("Unable to read frame: %d" % (ret,))
         #DEBUG("/prefetch_packet")
+
 
     cdef read_packet_buggy(self):
         """
@@ -3598,9 +3593,11 @@ cdef class FFMpegReader(AFFMpegReader):
             r.append(tt.get_current_frame())
         return r
 
+
     def get_next_frame(self):
         self.tracks[0].get_next_frame()
         return self.get_current_frame()
+
 
     def __len__(self):
         try:
@@ -3719,6 +3716,7 @@ cdef class FFMpegReader(AFFMpegReader):
     def reset_buffers(self):
         for  s in self.tracks:
             s.reset_buffers()
+
 
     def _finalize_seek_to(self, pts):
         """
