@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
 from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
@@ -67,6 +68,8 @@ def static_resolver(libs):
 
 libinc = [ path_join(ffmpegpath, 'lib') ]
 
+libs = [ 'avformat', 'avcodec', 'avutil', 'swscale' ]
+
 if platform in [ 'win32', 'win64' ] :
 
     libs = static_resolver(libs)
@@ -74,12 +77,10 @@ if platform in [ 'win32', 'win64' ] :
     incdir = path_join(ffmpegpath, 'include') 
 
 else:
-
-    libs = [ 'avformat', 'avcodec', 'avutil', 'swscale' ]
     incdir = [ path_join(ffmpegpath, 'include'), "/usr/include" , "./include" ] 
 
 if (with_numpy):
-  incdir = incdir + list(nd.get_numpy_include_dirs())
+    incdir = incdir + list(nd.get_numpy_include_dirs())
 
 ##################################################################################
 if with_numpy:
