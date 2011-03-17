@@ -5,7 +5,8 @@ from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
 from os.path import join as path_join
-from sys import platform
+
+print "Remember: Edit at first ffmpegpath within setup.py"
 
 ##################################################################################
 try:
@@ -13,12 +14,12 @@ try:
   with_numpy=True
 except:
   with_numpy=False
-  sys.stderr.write("Numpy does not seems to be installed on your system.\n")
-  sys.stderr.write("You may still use pyffmpeg but audiosupport and numpy-bridge are disabled.\n")  
+  sys.stderr.write("NumPy does not seems to be installed on your system.\n")
+  sys.stderr.write("You may still use PyFFmpeg, but audio support and NumPy bridge are disabled.\n")  
 
 ##################################################################################
 ## Try to locate source if necessary
-if platform in [ 'win32', 'win64' ] :
+if sys.platform in [ 'win32', 'win64' ] :
     ffmpegpath = r'c:\ffmpeg'
     for x in [ r'..\ffmpeg',  r'c:\ffmpeg-static', r'c:\ffmpeg' ]:
         try:
@@ -70,7 +71,7 @@ libinc = [ path_join(ffmpegpath, 'lib') ]
 
 libs = [ 'avformat', 'avcodec', 'avutil', 'swscale' ]
 
-if platform in [ 'win32', 'win64' ] :
+if sys.platform in [ 'win32', 'win64' ] :
 
     libs = static_resolver(libs)
     libinc += [ r'/mingw/lib' ] # it seems some people require this
