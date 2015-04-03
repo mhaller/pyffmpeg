@@ -11,7 +11,7 @@
   </head>
   <body>
     <section class="page-header">
-      <h1 class="project-name"><img src="images/pyffmpeg.png" /><br /><span style="color:#3d79aa;">Py</span><span style="color:#ffde56;">FFmpeg</span></h1>
+      <h1 class="project-name"><img src="images/pyffmpeg.png" alt="PyFFmpeg" /><br /><span style="color:#3d79aa;">Py</span><span style="color:#ffde56;">FFmpeg</span></h1>
       <h2 class="project-tagline">Python FFmpeg wrapper</h2>
       <a href="https://github.com/mhaller/pyffmpeg" class="btn">View on GitHub</a>
       <a href="https://github.com/mhaller/pyffmpeg/zipball/master" class="btn">Download .zip</a>
@@ -19,46 +19,111 @@
     </section>
 
     <section class="main-content">
-      <h3>
-<a id="notice" class="anchor" href="#notice" aria-hidden="true"><span class="octicon octicon-link"></span></a>Notice</h3>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<h3><a id="news" class="anchor" href="#notice" aria-hidden="true"><span class="octicon octicon-link"></span></a>News</h3>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<dl>
+<dt>2015-04-03</dt>
+<dd>We moved the project completely to <a href="https://github.com/mhaller/pyffmpeg">github.com/mhaller/pyffmpeg</a> since code.google.com will close its project hosting in the begin of 2016. 
+Further on, we're working again on an update for this wrapper.</dd> 
+</dl>
+
+<h3><a id="notice" class="anchor" href="#notice" aria-hidden="true"><span class="octicon octicon-link"></span></a>Notice</h3>
+
+<p>This software has been unmaintained for a long time. Due to major changes in the API, it won't compile currently with modern versions of FFmpeg. We need some time to update this project for the most recent FFmpeg version.</p>
+
+<p>There is no exact equivalent of pyffmpeg existing, but we do recommend that you have a look at projects like OpenCV and Media Lovin Toolkit - as they are generally able to similar features.</p>
+
+<h3><a id="description" class="anchor" href="#description" aria-hidden="true"><span class="octicon octicon-link"></span></a>Description</h3>
+
+<p><a href="https://ffmpeg.mplayerhq.hu/">FFmpeg</a> is a software package containing libraries and utilities for encoding, decoding and converting audio and video files. It includes libavcodec, a leading audio/video codec library that can work with most video and audio formats. This library generally uses its own codec. And thus it does not depend on your operating system installed libraries. Using FFmpeg and libavcodec you can develop applications that can parse and display video files and be sure they will work on most platform, including of course Linux, Macintosh, and Windows boxes.</p>
+
+<p>The libavcodec and libavformat libraries of the FFmpeg project are quite complex to use, especially from Python. PyFFmpeg provides a simple object oriented interface to those libraries. PyFFmpeg is a wrapper around FFmpeg's libavcodec, libavformat and libavutil libraries whose main purpose is to provide access to individual frames of video files of various <a href="https://www.ffmpeg.org/general.html#Supported-File-Formats_002c-Codecs-or-Features">formats and codecs</a> (such as mpg, mp4, mov, avi, flv, mkv, wmf, and webm). It also provides access to audio data.</p>
+
+<h3><a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h3>
+
+<img src="images/lgplv3-147x51.png" alt="LGPL" style="float: left; padding-right: 10px; padding-bottom: 10px;"/><p>PyFFmpeg is distributed under <a href="http://www.gnu.org/licenses/lgpl.html">LGPL-3.0</a>. See COPYING file as part of each release and the repository.</p>
+
+<h3><a id="2.2" class="anchor" href="#2.2" aria-hidden="true"><span class="octicon octicon-link"></span></a>PyFFmpeg 2.2 alpha</h3>
+
+<p>Support for <a href="http://git.ffmpeg.org/?p=ffmpeg.git;a=snapshot;h=35d7d6f7489c75aaa2fcb39820fb25b0fd44524b;sf=tgz">FFmpeg version git-35d7d6f</a> (Mar 2011) is provided by the <a href="https://github.com/mhaller/pyffmpeg">PyFFmpeg 2.2 alpha development version</a>.</p>
+
+<h3><a id="2.1" class="anchor" href="#2.2" aria-hidden="true"><span class="octicon octicon-link"></span></a>PyFFmpeg 2.1</h3>
+
+<p>We have recently performed a complete rewrite of PyFFmpeg. Now, PyFFmpeg can work with NumPy, Python Imaging Library (PIL), and Cairo. It supports <strong>video and audio decoding</strong>. It also supports reading from Internet streams.</p>
+
+<a href="http://code.google.com/p/pyffmpeg/downloads/list">Download PyFFmpeg 2.1</a> (DEPRECATED LINK)
+
+
+<h3><a id="example" class="anchor" href="#example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example for PyFFmpeg 2.1</h3>
+
+<pre><code>from pyffmpeg import FFMpegReader
+
+## create the reader object
+mp=FFMpegReader()
+
+## open an audio-video file
+mp.open("yourfile.mpg")
+tracks=mp.get_tracks()
+
+## define a function to be called back each time a frame is read...
+def obs(f):
+  display(f[2]) # you have to write your display function
+
+tracks[0].set_observer(obs)
+
+mp.run()</code></pre>
+
+<p>Other examples can be found in the example directory of the package.</p>
+
+<h3><a id="pil" class="anchor" href="#pil" aria-hidden="true"><span class="octicon octicon-link"></span></a>PIL</h3>
+
+<p>PyFFmpeg supports <a href="http://www.pythonware.com/products/pil/">Python Imaging Library (PIL)</a>, but functionality is limited to RGB color space for frames and audio decoding is not possible while PIL support is activated.</p>
+
+<h3><a id="NumPy" class="anchor" href="#NumPy" aria-hidden="true"><span class="octicon octicon-link"></span></a>NumPy</h3>
+
+<p><a href="http://www.numpy.org">NumPy</a> as the  scientific computing package for Python is required for audio and video decoding with PyFFmpeg. However, the dependency of PyFFmpeg on NumPy is optional, so that PyFFmpeg can be used only with PIL for easy access to frames of a video track in RGB without audio decoding.</p>
+
+<h3><a id="1.0" class="anchor" href="#1.0" aria-hidden="true"><span class="octicon octicon-link"></span></a>PyFFmpeg 1.0</h3>
+
+<p>PyFFmpeg has stayed in minimal status where it could be used to extract individual frames from video files and create <a href="http://www.pythonware.com/products/pil/">PIL</a> image objects from them.</p>
+
+<p>While there were several Python libraries that offer to play video files most of them did not provide any API to extract individual frames, and this is the reason PyFFmpeg was created.</p>
+
+<p>A more complex wrapper around FFmpeg has been implemented within <a href="http://pymedia.org/">PyMedia</a>. However, PyMEDIA is now based on and old version of FFmpeg, and probably also need some minor rewrites.</p>
+
+<h3><a id="example1.0" class="anchor" href="#example1.0" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example for PyFFmpeg 1.0</h3>
+
+<p>Here's a simple example that extracts the first frame from a video file and saves it in .png format. You'll need <a href="http://www.pythonware.com/products/pil/">PIL</a> to run it.
+
+<pre><code>import pyffmpeg
+
+stream = pyffmpeg.VideoStream()
+stream.open('myvideo.avi')
+image = stream.GetFrameNo(0)
+image.save('firstframe.png')
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<h3><a id="mailinglists" class="anchor" href="#mailinglists" aria-hidden="true"><span class="octicon octicon-link"></span></a>Mailinglists</h3>
 
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+The project has a <a href="https://groups.google.com/group/pyffmpeg">user questions</a> and a <a href="https://groups.google.com/group/pyffmpeg-dev">development discussions</a> mailing lists.
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<h3><a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
 
-<h3>
-<a id="rather-drive-stick" class="anchor" href="#rather-drive-stick" aria-hidden="true"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<p>Bertrand Nouvel founded the project in 2007. Currently, the project is maintained by Martin Haller (<a href="https://github.com/mhaller/" class="user-mention">@mhaller</a>).</p>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>
-<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p>There some more contributors and if we get permission to name them here, we will do it.</p>
 
 <h3>
 <a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="https://help.github.com/pages">https://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<p>Please <a href="https://github.com/mhaller/pyffmpeg/issues">report an issue</a> if you found an error or if you would like to contribute an improvement or extensions for PyFFmpeg.</p>
 
       <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/mhaller/pyffmpeg">PyFFmpeg</a> is maintained by <a href="https://github.com/mhaller">mhaller</a>.</span>
-
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+        <span class="site-footer-owner"><a href="https://github.com/mhaller/pyffmpeg">PyFFmpeg</a> is maintained by <a href="https://github.com/mhaller">Martin Haller (mhaller)</a>.</span>
       </footer>
 
     </section>
-
             <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
