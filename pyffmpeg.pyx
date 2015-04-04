@@ -2,9 +2,9 @@
 
 """
 ##################################################################################
-# PyFFmpeg v2.2 alpha 1
+# PyFFmpeg v2.3
 #
-# Copyright (C) 2011 Martin Haller <martin.haller@computer.org>
+# Copyright (C) 2011-2015 Martin Haller <martin@h4ll3r.net>
 # Copyright (C) 2011 Bertrand Nouvel <bertrand@lm3labs.com>
 # Copyright (C) 2008-2010 Bertrand Nouvel <nouvel@nii.ac.jp>
 #   Japanese French Laboratory for Informatics -  CNRS
@@ -94,107 +94,308 @@ cdef extern from "Python.h":
 
 
 ##################################################################################
-# ok libavutil    50. 39. 0 
+# ok libavutil    54. 20.100
 cdef extern from "libavutil/mathematics.h":
     int64_t av_rescale(int64_t a, int64_t b, int64_t c)
 
 
 ##################################################################################
-# ok libavutil    50. 39. 0
+# ok libavutil    54. 20.100
 cdef extern from "libavutil/mem.h":
-    # size_t is used 
-    #ctypedef unsigned long FF_INTERNAL_MEM_TYPE
-    ctypedef size_t FF_INTERNAL_MEM_TYPE
-    void *av_mallocz(FF_INTERNAL_MEM_TYPE size)
-    void *av_realloc(void * ptr, FF_INTERNAL_MEM_TYPE size)
+    void *av_mallocz(size_t size)
+    void *av_realloc(void * ptr, size_t size)
     void av_free(void *ptr)
     void av_freep(void *ptr)
     
     
 ##################################################################################
-# ok libavutil    50. 39. 0
+# ok libavutil   54. 20.100
 cdef extern from "libavutil/pixfmt.h":
-    cdef enum PixelFormat:
-        PIX_FMT_NONE= -1,
-        PIX_FMT_YUV420P,   #< planar YUV 4:2:0, 12bpp, (1 Cr & Cb sample per 2x2 Y samples)
-        PIX_FMT_YUYV422,   #< packed YUV 4:2:2, 16bpp, Y0 Cb Y1 Cr
-        PIX_FMT_RGB24,     #< packed RGB 8:8:8, 24bpp, RGBRGB...
-        PIX_FMT_BGR24,     #< packed RGB 8:8:8, 24bpp, BGRBGR...
-        PIX_FMT_YUV422P,   #< planar YUV 4:2:2, 16bpp, (1 Cr & Cb sample per 2x1 Y samples)
-        PIX_FMT_YUV444P,   #< planar YUV 4:4:4, 24bpp, (1 Cr & Cb sample per 1x1 Y samples)
-        PIX_FMT_YUV410P,   #< planar YUV 4:1:0,  9bpp, (1 Cr & Cb sample per 4x4 Y samples)
-        PIX_FMT_YUV411P,   #< planar YUV 4:1:1, 12bpp, (1 Cr & Cb sample per 4x1 Y samples)
-        PIX_FMT_GRAY8,     #<        Y        ,  8bpp
-        PIX_FMT_MONOWHITE, #<        Y        ,  1bpp, 0 is white, 1 is black, in each byte pixels are ordered from the msb to the lsb
-        PIX_FMT_MONOBLACK, #<        Y        ,  1bpp, 0 is black, 1 is white, in each byte pixels are ordered from the msb to the lsb
-        PIX_FMT_PAL8,      #< 8 bit with PIX_FMT_RGB32 palette
-        PIX_FMT_YUVJ420P,  #< planar YUV 4:2:0, 12bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV420P and setting color_range
-        PIX_FMT_YUVJ422P,  #< planar YUV 4:2:2, 16bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV422P and setting color_range
-        PIX_FMT_YUVJ444P,  #< planar YUV 4:4:4, 24bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV444P and setting color_range
-        PIX_FMT_XVMC_MPEG2_MC,#< XVideo Motion Acceleration via common packet passing
-        PIX_FMT_XVMC_MPEG2_IDCT,
-        PIX_FMT_UYVY422,   #< packed YUV 4:2:2, 16bpp, Cb Y0 Cr Y1
-        PIX_FMT_UYYVYY411, #< packed YUV 4:1:1, 12bpp, Cb Y0 Y1 Cr Y2 Y3
-        PIX_FMT_BGR8,      #< packed RGB 3:3:2,  8bpp, (msb)2B 3G 3R(lsb)
-        PIX_FMT_BGR4,      #< packed RGB 1:2:1 bitstream,  4bpp, (msb)1B 2G 1R(lsb), a byte contains two pixels, the first pixel in the byte is the one composed by the 4 msb bits
-        PIX_FMT_BGR4_BYTE, #< packed RGB 1:2:1,  8bpp, (msb)1B 2G 1R(lsb)
-        PIX_FMT_RGB8,      #< packed RGB 3:3:2,  8bpp, (msb)2R 3G 3B(lsb)
-        PIX_FMT_RGB4,      #< packed RGB 1:2:1 bitstream,  4bpp, (msb)1R 2G 1B(lsb), a byte contains two pixels, the first pixel in the byte is the one composed by the 4 msb bits
-        PIX_FMT_RGB4_BYTE, #< packed RGB 1:2:1,  8bpp, (msb)1R 2G 1B(lsb)
-        PIX_FMT_NV12,      #< planar YUV 4:2:0, 12bpp, 1 plane for Y and 1 plane for the UV components, which are interleaved (first byte U and the following byte V)
-        PIX_FMT_NV21,      #< as above, but U and V bytes are swapped
+    enum AVPixelFormat:
+        AV_PIX_FMT_NONE = -1,
+        AV_PIX_FMT_YUV420P,   #< planar YUV 4:2:0, 12bpp, (1 Cr & Cb sample per 2x2 Y samples)
+        AV_PIX_FMT_YUYV422,   #< packed YUV 4:2:2, 16bpp, Y0 Cb Y1 Cr
+        AV_PIX_FMT_RGB24,     #< packed RGB 8:8:8, 24bpp, RGBRGB...
+        AV_PIX_FMT_BGR24,     #< packed RGB 8:8:8, 24bpp, BGRBGR...
+        AV_PIX_FMT_YUV422P,   #< planar YUV 4:2:2, 16bpp, (1 Cr & Cb sample per 2x1 Y samples)
+        AV_PIX_FMT_YUV444P,   #< planar YUV 4:4:4, 24bpp, (1 Cr & Cb sample per 1x1 Y samples)
+        AV_PIX_FMT_YUV410P,   #< planar YUV 4:1:0,  9bpp, (1 Cr & Cb sample per 4x4 Y samples)
+        AV_PIX_FMT_YUV411P,   #< planar YUV 4:1:1, 12bpp, (1 Cr & Cb sample per 4x1 Y samples)
+        AV_PIX_FMT_GRAY8,     #<        Y        ,  8bpp
+        AV_PIX_FMT_MONOWHITE, #<        Y        ,  1bpp, 0 is white, 1 is black, in each byte pixels are ordered from the msb to the lsb
+        AV_PIX_FMT_MONOBLACK, #<        Y        ,  1bpp, 0 is black, 1 is white, in each byte pixels are ordered from the msb to the lsb
+        AV_PIX_FMT_PAL8,      #< 8 bit with PIX_FMT_RGB32 palette
+        AV_PIX_FMT_YUVJ420P,  #< planar YUV 4:2:0, 12bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV420P and setting color_range
+        AV_PIX_FMT_YUVJ422P,  #< planar YUV 4:2:2, 16bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV422P and setting color_range
+        AV_PIX_FMT_YUVJ444P,  #< planar YUV 4:4:4, 24bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV444P and setting color_range
+    #if FF_API_XVMC
+        AV_PIX_FMT_XVMC_MPEG2_MC,///< XVideo Motion Acceleration via common packet passing
+        AV_PIX_FMT_XVMC_MPEG2_IDCT,
+    #define AV_PIX_FMT_XVMC AV_PIX_FMT_XVMC_MPEG2_IDCT
+    #endif /* FF_API_XVMC */
+        AV_PIX_FMT_UYVY422,   #< packed YUV 4:2:2, 16bpp, Cb Y0 Cr Y1
+        AV_PIX_FMT_UYYVYY411, #< packed YUV 4:1:1, 12bpp, Cb Y0 Y1 Cr Y2 Y3
+        AV_PIX_FMT_BGR8,      #< packed RGB 3:3:2,  8bpp, (msb)2B 3G 3R(lsb)
+        AV_PIX_FMT_BGR4,      #< packed RGB 1:2:1 bitstream,  4bpp, (msb)1B 2G 1R(lsb), a byte contains two pixels, the first pixel in the byte is the one composed by the 4 msb bits
+        AV_PIX_FMT_BGR4_BYTE, #< packed RGB 1:2:1,  8bpp, (msb)1B 2G 1R(lsb)
+        AV_PIX_FMT_RGB8,      #< packed RGB 3:3:2,  8bpp, (msb)2R 3G 3B(lsb)
+        AV_PIX_FMT_RGB4,      #< packed RGB 1:2:1 bitstream,  4bpp, (msb)1R 2G 1B(lsb), a byte contains two pixels, the first pixel in the byte is the one composed by the 4 msb bits
+        AV_PIX_FMT_RGB4_BYTE, #< packed RGB 1:2:1,  8bpp, (msb)1R 2G 1B(lsb)
+        AV_PIX_FMT_NV12,      #< planar YUV 4:2:0, 12bpp, 1 plane for Y and 1 plane for the UV components, which are interleaved (first byte U and the following byte V)
+        AV_PIX_FMT_NV21,      #< as above, but U and V bytes are swapped
+
+        AV_PIX_FMT_ARGB,      #< packed ARGB 8:8:8:8, 32bpp, ARGBARGB...
+        AV_PIX_FMT_RGBA,      #< packed RGBA 8:8:8:8, 32bpp, RGBARGBA...
+        AV_PIX_FMT_ABGR,      #< packed ABGR 8:8:8:8, 32bpp, ABGRABGR...
+        AV_PIX_FMT_BGRA,      #< packed BGRA 8:8:8:8, 32bpp, BGRABGRA...
+
+        AV_PIX_FMT_GRAY16BE,  #<        Y        , 16bpp, big-endian
+        AV_PIX_FMT_GRAY16LE,  #<        Y        , 16bpp, little-endian
+        AV_PIX_FMT_YUV440P,   #< planar YUV 4:4:0 (1 Cr & Cb sample per 1x2 Y samples)
+        AV_PIX_FMT_YUVJ440P,  #< planar YUV 4:4:0 full scale (JPEG), deprecated in favor of PIX_FMT_YUV440P and setting color_range
+        AV_PIX_FMT_YUVA420P,  #< planar YUV 4:2:0, 20bpp, (1 Cr & Cb sample per 2x2 Y & A samples)
+    #if FF_API_VDPAU
+        AV_PIX_FMT_VDPAU_H264,  #< H.264 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
+        AV_PIX_FMT_VDPAU_MPEG1, #< MPEG-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
+        AV_PIX_FMT_VDPAU_MPEG2, #< MPEG-2 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
+        AV_PIX_FMT_VDPAU_WMV3,  #< WMV3 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
+        AV_PIX_FMT_VDPAU_VC1,   #< VC-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
+    #endif
+        AV_PIX_FMT_RGB48BE,   #< packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, the 2-byte value for each R/G/B component is stored as big-endian
+        AV_PIX_FMT_RGB48LE,   #< packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, the 2-byte value for each R/G/B component is stored as little-endian
+
+        AV_PIX_FMT_RGB565BE,  #< packed RGB 5:6:5, 16bpp, (msb)   5R 6G 5B(lsb), big-endian
+        AV_PIX_FMT_RGB565LE,  #< packed RGB 5:6:5, 16bpp, (msb)   5R 6G 5B(lsb), little-endian
+        AV_PIX_FMT_RGB555BE,  #< packed RGB 5:5:5, 16bpp, (msb)1X 5R 5G 5B(lsb), big-endian   , X=unused/undefined
+        AV_PIX_FMT_RGB555LE,  #< packed RGB 5:5:5, 16bpp, (msb)1X 5R 5G 5B(lsb), little-endian, X=unused/undefined
+
+        AV_PIX_FMT_BGR565BE,  #< packed BGR 5:6:5, 16bpp, (msb)   5B 6G 5R(lsb), big-endian
+        AV_PIX_FMT_BGR565LE,  #< packed BGR 5:6:5, 16bpp, (msb)   5B 6G 5R(lsb), little-endian
+        AV_PIX_FMT_BGR555BE,  #< packed BGR 5:5:5, 16bpp, (msb)1X 5B 5G 5R(lsb), big-endian   , X=unused/undefined
+        AV_PIX_FMT_BGR555LE,  #< packed BGR 5:5:5, 16bpp, (msb)1X 5B 5G 5R(lsb), little-endian, X=unused/undefined
+
+        AV_PIX_FMT_VAAPI_MOCO, #< HW acceleration through VA API at motion compensation entry-point, Picture.data[3] contains a vaapi_render_state struct which contains macroblocks as well as various fields extracted from headers
+        AV_PIX_FMT_VAAPI_IDCT, #< HW acceleration through VA API at IDCT entry-point, Picture.data[3] contains a vaapi_render_state struct which contains fields extracted from headers
+        AV_PIX_FMT_VAAPI_VLD,  #< HW decoding through VA API, Picture.data[3] contains a vaapi_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
+
+        AV_PIX_FMT_YUV420P16LE,  #< planar YUV 4:2:0, 24bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian
+        AV_PIX_FMT_YUV420P16BE,  #< planar YUV 4:2:0, 24bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian
+        AV_PIX_FMT_YUV422P16LE,  #< planar YUV 4:2:2, 32bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian
+        AV_PIX_FMT_YUV422P16BE,  #< planar YUV 4:2:2, 32bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian
+        AV_PIX_FMT_YUV444P16LE,  #< planar YUV 4:4:4, 48bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian
+        AV_PIX_FMT_YUV444P16BE,  #< planar YUV 4:4:4, 48bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian
     
-        PIX_FMT_ARGB,      #< packed ARGB 8:8:8:8, 32bpp, ARGBARGB...
-        PIX_FMT_RGBA,      #< packed RGBA 8:8:8:8, 32bpp, RGBARGBA...
-        PIX_FMT_ABGR,      #< packed ABGR 8:8:8:8, 32bpp, ABGRABGR...
-        PIX_FMT_BGRA,      #< packed BGRA 8:8:8:8, 32bpp, BGRABGRA...
+        AV_PIX_FMT_VDPAU_MPEG4,  #< MPEG4 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
     
-        PIX_FMT_GRAY16BE,  #<        Y        , 16bpp, big-endian
-        PIX_FMT_GRAY16LE,  #<        Y        , 16bpp, little-endian
-        PIX_FMT_YUV440P,   #< planar YUV 4:4:0 (1 Cr & Cb sample per 1x2 Y samples)
-        PIX_FMT_YUVJ440P,  #< planar YUV 4:4:0 full scale (JPEG), deprecated in favor of PIX_FMT_YUV440P and setting color_range
-        PIX_FMT_YUVA420P,  #< planar YUV 4:2:0, 20bpp, (1 Cr & Cb sample per 2x2 Y & A samples)
-        PIX_FMT_VDPAU_H264,#< H.264 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
-        PIX_FMT_VDPAU_MPEG1,#< MPEG-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
-        PIX_FMT_VDPAU_MPEG2,#< MPEG-2 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
-        PIX_FMT_VDPAU_WMV3,#< WMV3 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
-        PIX_FMT_VDPAU_VC1, #< VC-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
-        PIX_FMT_RGB48BE,   #< packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, the 2-byte value for each R/G/B component is stored as big-endian
-        PIX_FMT_RGB48LE,   #< packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, the 2-byte value for each R/G/B component is stored as little-endian
-    
-        PIX_FMT_RGB565BE,  #< packed RGB 5:6:5, 16bpp, (msb)   5R 6G 5B(lsb), big-endian
-        PIX_FMT_RGB565LE,  #< packed RGB 5:6:5, 16bpp, (msb)   5R 6G 5B(lsb), little-endian
-        PIX_FMT_RGB555BE,  #< packed RGB 5:5:5, 16bpp, (msb)1A 5R 5G 5B(lsb), big-endian, most significant bit to 0
-        PIX_FMT_RGB555LE,  #< packed RGB 5:5:5, 16bpp, (msb)1A 5R 5G 5B(lsb), little-endian, most significant bit to 0
-    
-        PIX_FMT_BGR565BE,  #< packed BGR 5:6:5, 16bpp, (msb)   5B 6G 5R(lsb), big-endian
-        PIX_FMT_BGR565LE,  #< packed BGR 5:6:5, 16bpp, (msb)   5B 6G 5R(lsb), little-endian
-        PIX_FMT_BGR555BE,  #< packed BGR 5:5:5, 16bpp, (msb)1A 5B 5G 5R(lsb), big-endian, most significant bit to 1
-        PIX_FMT_BGR555LE,  #< packed BGR 5:5:5, 16bpp, (msb)1A 5B 5G 5R(lsb), little-endian, most significant bit to 1
-    
-        PIX_FMT_VAAPI_MOCO, #< HW acceleration through VA API at motion compensation entry-point, Picture.data[3] contains a vaapi_render_state struct which contains macroblocks as well as various fields extracted from headers
-        PIX_FMT_VAAPI_IDCT, #< HW acceleration through VA API at IDCT entry-point, Picture.data[3] contains a vaapi_render_state struct which contains fields extracted from headers
-        PIX_FMT_VAAPI_VLD,  #< HW decoding through VA API, Picture.data[3] contains a vaapi_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
-    
-        PIX_FMT_YUV420P16LE,  #< planar YUV 4:2:0, 24bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian
-        PIX_FMT_YUV420P16BE,  #< planar YUV 4:2:0, 24bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian
-        PIX_FMT_YUV422P16LE,  #< planar YUV 4:2:2, 32bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian
-        PIX_FMT_YUV422P16BE,  #< planar YUV 4:2:2, 32bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian
-        PIX_FMT_YUV444P16LE,  #< planar YUV 4:4:4, 48bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian
-        PIX_FMT_YUV444P16BE,  #< planar YUV 4:4:4, 48bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian
-        PIX_FMT_VDPAU_MPEG4,  #< MPEG4 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
-        PIX_FMT_DXVA2_VLD,    #< HW decoding through DXVA2, Picture.data[3] contains a LPDIRECT3DSURFACE9 pointer
-    
-        PIX_FMT_RGB444BE,  #< packed RGB 4:4:4, 16bpp, (msb)4A 4R 4G 4B(lsb), big-endian, most significant bits to 0
-        PIX_FMT_RGB444LE,  #< packed RGB 4:4:4, 16bpp, (msb)4A 4R 4G 4B(lsb), little-endian, most significant bits to 0
-        PIX_FMT_BGR444BE,  #< packed BGR 4:4:4, 16bpp, (msb)4A 4B 4G 4R(lsb), big-endian, most significant bits to 1
-        PIX_FMT_BGR444LE,  #< packed BGR 4:4:4, 16bpp, (msb)4A 4B 4G 4R(lsb), little-endian, most significant bits to 1
-        PIX_FMT_Y400A,     #< 8bit gray, 8bit alpha
-        PIX_FMT_NB         #< number of pixel formats, DO NOT USE THIS if you want to link with shared libav* because the number of formats might differ between versions
+        AV_PIX_FMT_DXVA2_VLD,    #< HW decoding through DXVA2, Picture.data[3] contains a LPDIRECT3DSURFACE9 pointer
+
+        AV_PIX_FMT_RGB444LE,  #< packed RGB 4:4:4, 16bpp, (msb)4X 4R 4G 4B(lsb), little-endian, X=unused/undefined
+        AV_PIX_FMT_RGB444BE,  #< packed RGB 4:4:4, 16bpp, (msb)4X 4R 4G 4B(lsb), big-endian,    X=unused/undefined
+        AV_PIX_FMT_BGR444LE,  #< packed BGR 4:4:4, 16bpp, (msb)4X 4B 4G 4R(lsb), little-endian, X=unused/undefined
+        AV_PIX_FMT_BGR444BE,  #< packed BGR 4:4:4, 16bpp, (msb)4X 4B 4G 4R(lsb), big-endian,    X=unused/undefined
+        AV_PIX_FMT_YA8,       #< 8bit gray, 8bit alpha
+
+        AV_PIX_FMT_Y400A = AV_PIX_FMT_YA8, #< alias for AV_PIX_FMT_YA8
+        AV_PIX_FMT_GRAY8A= AV_PIX_FMT_YA8, #< alias for AV_PIX_FMT_YA8
+
+        AV_PIX_FMT_BGR48BE,   #< packed RGB 16:16:16, 48bpp, 16B, 16G, 16R, the 2-byte value for each R/G/B component is stored as big-endian
+        AV_PIX_FMT_BGR48LE,   #< packed RGB 16:16:16, 48bpp, 16B, 16G, 16R, the 2-byte value for each R/G/B component is stored as little-endian
+
+        AV_PIX_FMT_YUV420P9BE, #< planar YUV 4:2:0, 13.5bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian
+        AV_PIX_FMT_YUV420P9LE, #< planar YUV 4:2:0, 13.5bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian
+        AV_PIX_FMT_YUV420P10BE,#< planar YUV 4:2:0, 15bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian
+        AV_PIX_FMT_YUV420P10LE,#< planar YUV 4:2:0, 15bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian
+        AV_PIX_FMT_YUV422P10BE,#< planar YUV 4:2:2, 20bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian
+        AV_PIX_FMT_YUV422P10LE,#< planar YUV 4:2:2, 20bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian
+        AV_PIX_FMT_YUV444P9BE, #< planar YUV 4:4:4, 27bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian
+        AV_PIX_FMT_YUV444P9LE, #< planar YUV 4:4:4, 27bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian
+        AV_PIX_FMT_YUV444P10BE,#< planar YUV 4:4:4, 30bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian
+        AV_PIX_FMT_YUV444P10LE,#< planar YUV 4:4:4, 30bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian
+        AV_PIX_FMT_YUV422P9BE, #< planar YUV 4:2:2, 18bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian
+        AV_PIX_FMT_YUV422P9LE, #< planar YUV 4:2:2, 18bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian
+        AV_PIX_FMT_VDA_VLD,    #< hardware decoding through VDA
+
+        AV_PIX_FMT_RGBA64BE,  #< packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as big-endian
+        AV_PIX_FMT_RGBA64LE,  #< packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as little-endian
+        AV_PIX_FMT_BGRA64BE,  #< packed RGBA 16:16:16:16, 64bpp, 16B, 16G, 16R, 16A, the 2-byte value for each R/G/B/A component is stored as big-endian
+        AV_PIX_FMT_BGRA64LE,  #< packed RGBA 16:16:16:16, 64bpp, 16B, 16G, 16R, 16A, the 2-byte value for each R/G/B/A component is stored as little-endian
+
+        AV_PIX_FMT_GBRP,      #< planar GBR 4:4:4 24bpp
+        AV_PIX_FMT_GBRP9BE,   #< planar GBR 4:4:4 27bpp, big-endian
+        AV_PIX_FMT_GBRP9LE,   #< planar GBR 4:4:4 27bpp, little-endian
+        AV_PIX_FMT_GBRP10BE,  #< planar GBR 4:4:4 30bpp, big-endian
+        AV_PIX_FMT_GBRP10LE,  #< planar GBR 4:4:4 30bpp, little-endian
+        AV_PIX_FMT_GBRP16BE,  #< planar GBR 4:4:4 48bpp, big-endian
+        AV_PIX_FMT_GBRP16LE,  #< planar GBR 4:4:4 48bpp, little-endian
+
+        AV_PIX_FMT_YUVA422P_LIBAV,  #< planar YUV 4:2:2 24bpp, (1 Cr & Cb sample per 2x1 Y & A samples)
+        AV_PIX_FMT_YUVA444P_LIBAV,  #< planar YUV 4:4:4 32bpp, (1 Cr & Cb sample per 1x1 Y & A samples)
+
+        AV_PIX_FMT_YUVA420P9BE,  #< planar YUV 4:2:0 22.5bpp, (1 Cr & Cb sample per 2x2 Y & A samples), big-endian
+        AV_PIX_FMT_YUVA420P9LE,  #< planar YUV 4:2:0 22.5bpp, (1 Cr & Cb sample per 2x2 Y & A samples), little-endian
+        AV_PIX_FMT_YUVA422P9BE,  #< planar YUV 4:2:2 27bpp, (1 Cr & Cb sample per 2x1 Y & A samples), big-endian
+        AV_PIX_FMT_YUVA422P9LE,  #< planar YUV 4:2:2 27bpp, (1 Cr & Cb sample per 2x1 Y & A samples), little-endian
+        AV_PIX_FMT_YUVA444P9BE,  #< planar YUV 4:4:4 36bpp, (1 Cr & Cb sample per 1x1 Y & A samples), big-endian
+        AV_PIX_FMT_YUVA444P9LE,  #< planar YUV 4:4:4 36bpp, (1 Cr & Cb sample per 1x1 Y & A samples), little-endian
+        AV_PIX_FMT_YUVA420P10BE, #< planar YUV 4:2:0 25bpp, (1 Cr & Cb sample per 2x2 Y & A samples, big-endian)
+        AV_PIX_FMT_YUVA420P10LE, #< planar YUV 4:2:0 25bpp, (1 Cr & Cb sample per 2x2 Y & A samples, little-endian)
+        AV_PIX_FMT_YUVA422P10BE, #< planar YUV 4:2:2 30bpp, (1 Cr & Cb sample per 2x1 Y & A samples, big-endian)
+        AV_PIX_FMT_YUVA422P10LE, #< planar YUV 4:2:2 30bpp, (1 Cr & Cb sample per 2x1 Y & A samples, little-endian)
+        AV_PIX_FMT_YUVA444P10BE, #< planar YUV 4:4:4 40bpp, (1 Cr & Cb sample per 1x1 Y & A samples, big-endian)
+        AV_PIX_FMT_YUVA444P10LE, #< planar YUV 4:4:4 40bpp, (1 Cr & Cb sample per 1x1 Y & A samples, little-endian)
+        AV_PIX_FMT_YUVA420P16BE, #< planar YUV 4:2:0 40bpp, (1 Cr & Cb sample per 2x2 Y & A samples, big-endian)
+        AV_PIX_FMT_YUVA420P16LE, #< planar YUV 4:2:0 40bpp, (1 Cr & Cb sample per 2x2 Y & A samples, little-endian)
+        AV_PIX_FMT_YUVA422P16BE, #< planar YUV 4:2:2 48bpp, (1 Cr & Cb sample per 2x1 Y & A samples, big-endian)
+        AV_PIX_FMT_YUVA422P16LE, #< planar YUV 4:2:2 48bpp, (1 Cr & Cb sample per 2x1 Y & A samples, little-endian)
+        AV_PIX_FMT_YUVA444P16BE, #< planar YUV 4:4:4 64bpp, (1 Cr & Cb sample per 1x1 Y & A samples, big-endian)
+        AV_PIX_FMT_YUVA444P16LE, #< planar YUV 4:4:4 64bpp, (1 Cr & Cb sample per 1x1 Y & A samples, little-endian)
+
+        AV_PIX_FMT_VDPAU,     #< HW acceleration through VDPAU, Picture.data[3] contains a VdpVideoSurface
+
+        AV_PIX_FMT_XYZ12LE,      #< packed XYZ 4:4:4, 36 bpp, (msb) 12X, 12Y, 12Z (lsb), the 2-byte value for each X/Y/Z is stored as little-endian, the 4 lower bits are set to 0
+        AV_PIX_FMT_XYZ12BE,      #< packed XYZ 4:4:4, 36 bpp, (msb) 12X, 12Y, 12Z (lsb), the 2-byte value for each X/Y/Z is stored as big-endian, the 4 lower bits are set to 0
+        AV_PIX_FMT_NV16,         #< interleaved chroma YUV 4:2:2, 16bpp, (1 Cr & Cb sample per 2x1 Y samples)
+        AV_PIX_FMT_NV20LE,       #< interleaved chroma YUV 4:2:2, 20bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian
+        AV_PIX_FMT_NV20BE,       #< interleaved chroma YUV 4:2:2, 20bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian
+
+        AV_PIX_FMT_RGBA64BE_LIBAV, #< packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as big-endian
+        AV_PIX_FMT_RGBA64LE_LIBAV, #< packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as little-endian
+        AV_PIX_FMT_BGRA64BE_LIBAV, #< packed RGBA 16:16:16:16, 64bpp, 16B, 16G, 16R, 16A, the 2-byte value for each R/G/B/A component is stored as big-endian
+        AV_PIX_FMT_BGRA64LE_LIBAV, #< packed RGBA 16:16:16:16, 64bpp, 16B, 16G, 16R, 16A, the 2-byte value for each R/G/B/A component is stored as little-endian
+
+        AV_PIX_FMT_YVYU422,   #< packed YUV 4:2:2, 16bpp, Y0 Cr Y1 Cb
+
+        AV_PIX_FMT_VDA,          #< HW acceleration through VDA, data[3] contains a CVPixelBufferRef
+
+        AV_PIX_FMT_YA16BE,       #< 16bit gray, 16bit alpha (big-endian)
+        AV_PIX_FMT_YA16LE,       #< 16bit gray, 16bit alpha (little-endian)
+
+        AV_PIX_FMT_GBRAP_LIBAV,        #< planar GBRA 4:4:4:4 32bpp
+        AV_PIX_FMT_GBRAP16BE_LIBAV,    #< planar GBRA 4:4:4:4 64bpp, big-endian
+        AV_PIX_FMT_GBRAP16LE_LIBAV,    #< planar GBRA 4:4:4:4 64bpp, little-endian
+        AV_PIX_FMT_QSV,
+
+        AV_PIX_FMT_RGBA64BE=0x123,  #< packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as big-endian
+        AV_PIX_FMT_RGBA64LE,        #< packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as little-endian
+        AV_PIX_FMT_BGRA64BE,        #< packed RGBA 16:16:16:16, 64bpp, 16B, 16G, 16R, 16A, the 2-byte value for each R/G/B/A component is stored as big-endian
+        AV_PIX_FMT_BGRA64LE,        #< packed RGBA 16:16:16:16, 64bpp, 16B, 16G, 16R, 16A, the 2-byte value for each R/G/B/A component is stored as little-endian
+
+        AV_PIX_FMT_0RGB=0x123+4, #< packed RGB 8:8:8, 32bpp, XRGBXRGB...   X=unused/undefined
+        AV_PIX_FMT_RGB0,         #< packed RGB 8:8:8, 32bpp, RGBXRGBX...   X=unused/undefined
+        AV_PIX_FMT_0BGR,         #< packed BGR 8:8:8, 32bpp, XBGRXBGR...   X=unused/undefined
+        AV_PIX_FMT_BGR0,         #< packed BGR 8:8:8, 32bpp, BGRXBGRX...   X=unused/undefined
+        AV_PIX_FMT_YUVA444P,     #< planar YUV 4:4:4 32bpp, (1 Cr & Cb sample per 1x1 Y & A samples)
+        AV_PIX_FMT_YUVA422P,     #< planar YUV 4:2:2 24bpp, (1 Cr & Cb sample per 2x1 Y & A samples)
+
+        AV_PIX_FMT_YUV420P12BE, #< planar YUV 4:2:0,18bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian
+        AV_PIX_FMT_YUV420P12LE, #< planar YUV 4:2:0,18bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian
+        AV_PIX_FMT_YUV420P14BE, #< planar YUV 4:2:0,21bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian
+        AV_PIX_FMT_YUV420P14LE, #< planar YUV 4:2:0,21bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian
+        AV_PIX_FMT_YUV422P12BE, #< planar YUV 4:2:2,24bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian
+        AV_PIX_FMT_YUV422P12LE, #< planar YUV 4:2:2,24bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian
+        AV_PIX_FMT_YUV422P14BE, #< planar YUV 4:2:2,28bpp, (1 Cr & Cb sample per 2x1 Y samples), big-endian
+        AV_PIX_FMT_YUV422P14LE, #< planar YUV 4:2:2,28bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian
+        AV_PIX_FMT_YUV444P12BE, #< planar YUV 4:4:4,36bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian
+        AV_PIX_FMT_YUV444P12LE, #< planar YUV 4:4:4,36bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian
+        AV_PIX_FMT_YUV444P14BE, #< planar YUV 4:4:4,42bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian
+        AV_PIX_FMT_YUV444P14LE, #< planar YUV 4:4:4,42bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian
+        AV_PIX_FMT_GBRP12BE,    #< planar GBR 4:4:4 36bpp, big-endian
+        AV_PIX_FMT_GBRP12LE,    #< planar GBR 4:4:4 36bpp, little-endian
+        AV_PIX_FMT_GBRP14BE,    #< planar GBR 4:4:4 42bpp, big-endian
+        AV_PIX_FMT_GBRP14LE,    #< planar GBR 4:4:4 42bpp, little-endian
+        AV_PIX_FMT_GBRAP,       #< planar GBRA 4:4:4:4 32bpp
+        AV_PIX_FMT_GBRAP16BE,   #< planar GBRA 4:4:4:4 64bpp, big-endian
+        AV_PIX_FMT_GBRAP16LE,   #< planar GBRA 4:4:4:4 64bpp, little-endian
+        AV_PIX_FMT_YUVJ411P,    #< planar YUV 4:1:1, 12bpp, (1 Cr & Cb sample per 4x1 Y samples) full scale (JPEG), deprecated in favor of PIX_FMT_YUV411P and setting color_range
+
+        AV_PIX_FMT_BAYER_BGGR8,    #< bayer, BGBG..(odd line), GRGR..(even line), 8-bit samples */
+        AV_PIX_FMT_BAYER_RGGB8,    #< bayer, RGRG..(odd line), GBGB..(even line), 8-bit samples */
+        AV_PIX_FMT_BAYER_GBRG8,    #< bayer, GBGB..(odd line), RGRG..(even line), 8-bit samples */
+        AV_PIX_FMT_BAYER_GRBG8,    #< bayer, GRGR..(odd line), BGBG..(even line), 8-bit samples */
+        AV_PIX_FMT_BAYER_BGGR16LE, #< bayer, BGBG..(odd line), GRGR..(even line), 16-bit samples, little-endian */
+        AV_PIX_FMT_BAYER_BGGR16BE, #< bayer, BGBG..(odd line), GRGR..(even line), 16-bit samples, big-endian */
+        AV_PIX_FMT_BAYER_RGGB16LE, #< bayer, RGRG..(odd line), GBGB..(even line), 16-bit samples, little-endian */
+        AV_PIX_FMT_BAYER_RGGB16BE, #< bayer, RGRG..(odd line), GBGB..(even line), 16-bit samples, big-endian */
+        AV_PIX_FMT_BAYER_GBRG16LE, #< bayer, GBGB..(odd line), RGRG..(even line), 16-bit samples, little-endian */
+        AV_PIX_FMT_BAYER_GBRG16BE, #< bayer, GBGB..(odd line), RGRG..(even line), 16-bit samples, big-endian */
+        AV_PIX_FMT_BAYER_GRBG16LE, #< bayer, GRGR..(odd line), BGBG..(even line), 16-bit samples, little-endian */
+        AV_PIX_FMT_BAYER_GRBG16BE, #< bayer, GRGR..(odd line), BGBG..(even line), 16-bit samples, big-endian */
+        AV_PIX_FMT_XVMC,#< XVideo Motion Acceleration via common packet passing
+        AV_PIX_FMT_NB,        #< number of pixel formats, DO NOT USE THIS if you want to link with shared libav* because the number of formats might differ between versions
+
+
+    # ok libavutil/pixfmt.h     54. 20.100 
+    enum AVColorPrimaries:
+        AVCOL_PRI_BT709       = 1    #< also ITU-R BT1361 / IEC 61966-2-4 / SMPTE RP177 Annex B
+        AVCOL_PRI_UNSPECIFIED = 2
+        AVCOL_PRI_BT470M      = 4
+        AVCOL_PRI_BT470BG     = 5    #< also ITU-R BT601-6 625 / ITU-R BT1358 625 / ITU-R BT1700 625 PAL & SECAM
+        AVCOL_PRI_SMPTE170M   = 6    #< also ITU-R BT601-6 525 / ITU-R BT1358 525 / ITU-R BT1700 NTSC
+        AVCOL_PRI_SMPTE240M   = 7    #< functionally identical to above
+        AVCOL_PRI_FILM        = 8
+        AVCOL_PRI_BT2020      = 9    #< ITU-R BT2020
+        AVCOL_PRI_NB          = 10   #< Not part of ABI
+      
+      
+    # ok libavutil/pixfmt.h   54. 20.100      
+    enum AVColorTransferCharacteristic:
+        AVCOL_TRC_RESERVED0    = 0
+        AVCOL_TRC_BT709        = 1      #< also ITU-R BT1361
+        AVCOL_TRC_UNSPECIFIED  = 2
+        AVCOL_TRC_RESERVED     = 3
+        AVCOL_TRC_GAMMA22      = 4      #< also ITU-R BT470M / ITU-R BT1700 625 PAL & SECAM
+        AVCOL_TRC_GAMMA28      = 5      #< also ITU-R BT470BG
+        AVCOL_TRC_SMPTE170M    = 6      #< also ITU-R BT601-6 525 or 625 / ITU-R BT1358 525 or 625 / ITU-R BT1700 NTSC
+        AVCOL_TRC_SMPTE240M    = 7
+        AVCOL_TRC_LINEAR       = 8      #< "Linear transfer characteristics"
+        AVCOL_TRC_LOG          = 9      #< "Logarithmic transfer characteristic (100:1 range)"
+        AVCOL_TRC_LOG_SQRT     = 10     #< "Logarithmic transfer characteristic (100 * Sqrt(10) : 1 range)"
+        AVCOL_TRC_IEC61966_2_4 = 11     #< IEC 61966-2-4
+        AVCOL_TRC_BT1361_ECG   = 12     #< ITU-R BT1361 Extended Colour Gamut
+        AVCOL_TRC_IEC61966_2_1 = 13     #< IEC 61966-2-1 (sRGB or sYCC)
+        AVCOL_TRC_BT2020_10    = 14     #< ITU-R BT2020 for 10 bit system
+        AVCOL_TRC_BT2020_12    = 15     #< ITU-R BT2020 for 12 bit system
+        AVCOL_TRC_NB           = 16     #< Not part of ABI
+
+
+    # ok libavutil/pixfmt.h   54. 20.100
+    enum AVColorSpace:
+        AVCOL_SPC_RGB         = 0    #< order of coefficients is actually GBR, also IEC 61966-2-1 (sRGB)
+        AVCOL_SPC_BT709       = 1    #< also ITU-R BT1361 / IEC 61966-2-4 xvYCC709 / SMPTE RP177 Annex B
+        AVCOL_SPC_UNSPECIFIED = 2
+        AVCOL_SPC_RESERVED    = 3
+        AVCOL_SPC_FCC         = 4    #< FCC Title 47 Code of Federal Regulations 73.682 (a)(20)
+        AVCOL_SPC_BT470BG     = 5    #< also ITU-R BT601-6 625 / ITU-R BT1358 625 / ITU-R BT1700 625 PAL & SECAM / IEC 61966-2-4 xvYCC601
+        AVCOL_SPC_SMPTE170M   = 6    #< also ITU-R BT601-6 525 / ITU-R BT1358 525 / ITU-R BT1700 NTSC / functionally identical to above
+        AVCOL_SPC_SMPTE240M   = 7
+        AVCOL_SPC_YCOCG       = 8    #< Used by Dirac / VC-2 and H.264 FRext, see ITU-T SG16
+        AVCOL_SPC_BT2020_NCL  = 9    #< ITU-R BT2020 non-constant luminance system
+        AVCOL_SPC_BT2020_CL   = 10   #< ITU-R BT2020 constant luminance system
+        AVCOL_SPC_NB          = 11   #< Not part of ABI
+
+
+    # ok libavutil/pixfmt.h   54. 20.100
+    enum AVColorRange:
+        AVCOL_RANGE_UNSPECIFIED = 0
+        AVCOL_RANGE_MPEG        = 1  #< the normal 219*2^(n-8) "MPEG" YUV ranges
+        AVCOL_RANGE_JPEG        = 2  #< the normal     2^n-1   "JPEG" YUV ranges
+        AVCOL_RANGE_NB          = 3  #< Not part of ABI
+
+
+    # ok libavutil/pixfmt.h   54. 20.100
+    enum AVChromaLocation:
+        AVCHROMA_LOC_UNSPECIFIED = 0
+        AVCHROMA_LOC_LEFT        = 1    #< mpeg2/4, h264 default
+        AVCHROMA_LOC_CENTER      = 2    #< mpeg1, jpeg, h263
+        AVCHROMA_LOC_TOPLEFT     = 3    #< DV
+        AVCHROMA_LOC_TOP         = 4
+        AVCHROMA_LOC_BOTTOMLEFT  = 5
+        AVCHROMA_LOC_BOTTOM      = 6
+        AVCHROMA_LOC_NB          = 7    #< Not part of ABI
 
 
 ##################################################################################
-# ok libavutil    50. 39. 0
+# ok libavutil    54. 20.100
 cdef extern from "libavutil/avutil.h":
     # from avutil.h
     enum AVMediaType:
@@ -206,6 +407,17 @@ cdef extern from "libavutil/avutil.h":
         AVMEDIA_TYPE_ATTACHMENT,
         AVMEDIA_TYPE_NB
 
+    # ok libavutil/avutil.h     54. 20.100 
+    enum AVPictureType:
+        AV_PICTURE_TYPE_NONE= 0, #< Undefined
+        AV_PICTURE_TYPE_BI,    #< Intra
+        AV_PICTURE_TYPE_P,     #< Predicted
+        AV_PICTURE_TYPE_B,     #< Bi-dir predicted
+        AV_PICTURE_TYPE_S,     #< S(GMC)-VOP MPEG4
+        AV_PICTURE_TYPE_SI,    #< Switching Intra
+        AV_PICTURE_TYPE_SP,    #< Switching Predicted
+        AV_PICTURE_TYPE_BI,    #< BI type        
+
     # unnamed enum for defines
     enum:        
         AV_NOPTS_VALUE = <int64_t>0x8000000000000000
@@ -216,7 +428,7 @@ cdef extern from "libavutil/avutil.h":
 
 
 ##################################################################################
-# ok libavutil    50. 39. 0
+# ok libavutil    54. 20.100
 cdef extern from "libavutil/samplefmt.h":
     enum AVSampleFormat:
         AV_SAMPLE_FMT_NONE = -1,
@@ -225,11 +437,18 @@ cdef extern from "libavutil/samplefmt.h":
         AV_SAMPLE_FMT_S32,         #< signed 32 bits
         AV_SAMPLE_FMT_FLT,         #< float
         AV_SAMPLE_FMT_DBL,         #< double
-        AV_SAMPLE_FMT_NB           #< Number of sample formats. DO NOT USE if dynamically linking to libavcore
+
+        AV_SAMPLE_FMT_U8P,         #< unsigned 8 bits, planar
+        AV_SAMPLE_FMT_S16P,        #< signed 16 bits, planar
+        AV_SAMPLE_FMT_S32P,        #< signed 32 bits, planar
+        AV_SAMPLE_FMT_FLTP,        #< float, planar
+        AV_SAMPLE_FMT_DBLP,        #< double, planar
+
+        AV_SAMPLE_FMT_NB           #< Number of sample formats. DO NOT USE if linking dynamically
 
 
 ##################################################################################
-# ok libavutil    50. 39. 0
+# ok libavutil    54. 20.100
 cdef extern from "libavutil/rational.h":
     struct AVRational:
         int num                    #< numerator
@@ -237,37 +456,49 @@ cdef extern from "libavutil/rational.h":
 
 
 ##################################################################################
-# ok libavformat  52.102. 0 
+# ok libavformat  56. 25.101
 cdef extern from "libavformat/avio.h":
     
     struct AVIOContext:
-        unsigned char *buffer
+        const AVClass *av_class
+        unsigned char *buffer  
         int buffer_size
-        unsigned char *buf_ptr, *buf_end
+        unsigned char *buf_ptr
+        unsigned char *buf_end
         void *opaque
         int *read_packet
         int *write_packet
         int64_t *seek
-        int64_t pos #< position in the file of the current buffer 
-        int must_flush #< true if the next seek should flush 
-        int eof_reached #< true if eof reached 
-        int write_flag  #< true if open for writing 
-        int is_streamed
+        int64_t pos
+        int must_flush
+        int eof_reached
+        int write_flag
         int max_packet_size
         unsigned long checksum
         unsigned char *checksum_ptr
         unsigned long *update_checksum
-        int error         #< contains the error code or 0 if no error happened
+        int error
         int *read_pause
         int64_t *read_seek
+        int seekable
+        int64_t maxsize
+        int direct
+        int64_t bytes_read
+        int seek_count
+        int writeout_count
+        int orig_buffer_size
 
-    
-    int url_setbufsize(AVIOContext *s, int buf_size)
-    int url_ferror(AVIOContext *s)
+    #int url_setbufsize(AVIOContext *s, int buf_size)
+    #int url_ferror(AVIOContext *s)
+
     int avio_open(AVIOContext **s, char *url, int flags)    
     int avio_close(AVIOContext *s)
+
     int avio_read(AVIOContext *s, unsigned char *buf, int size)
-    int64_t avio_seek(AVIOContext *s, int64_t offset, int whence)    
+    # fseek() equivalent for AVIOContext
+    int64_t avio_seek(AVIOContext *s, int64_t offset, int whence) 
+    # Seek to a given timestamp relative to some component stream.
+    int64_t avio_seek_time(AVIOContext *s, int stream_index, int64_t timestamp, int flags)
     AVIOContext *avio_alloc_context(
                       unsigned char *buffer,
                       int buffer_size,
@@ -316,7 +547,7 @@ cdef extern from "libavformat/avio.h":
     
     
 ##################################################################################
-# ok libavcodec   52.113. 2
+# ok libavcodec   56. 26.100
 cdef extern from "libavcodec/avcodec.h":
     # use an unamed enum for defines
     cdef enum:
@@ -332,7 +563,7 @@ cdef extern from "libavcodec/avcodec.h":
         CODEC_FLAG_INPUT_PRESERVED      = 0x0100
         CODEC_FLAG_PASS1                = 0x0200   #< Use internal 2pass ratecontrol in first pass mode.
         CODEC_FLAG_PASS2                = 0x0400   #< Use internal 2pass ratecontrol in second pass mode.
-        CODEC_FLAG_EXTERN_HUFF          = 0x1000   #< Use external Huffman table (for MJPEG).
+        #CODEC_FLAG_EXTERN_HUFF          = 0x1000   #< Use external Huffman table (for MJPEG).
         CODEC_FLAG_GRAY                 = 0x2000   #< Only decode/encode grayscale.
         CODEC_FLAG_EMU_EDGE             = 0x4000   #< Don't draw edges.
         CODEC_FLAG_PSNR                 = 0x8000   #< error[?] variables will be set during encoding.
@@ -345,43 +576,24 @@ cdef extern from "libavcodec/avcodec.h":
         CODEC_FLAG_BITEXACT             = 0x00800000 #< Use only bitexact stuff (except (I)DCT).
         # Fx : Flag for h263+ extra options 
         CODEC_FLAG_AC_PRED              = 0x01000000 #< H.263 advanced intra coding / MPEG-4 AC prediction
-        CODEC_FLAG_H263P_UMV            = 0x02000000 #< unlimited motion vector
-        CODEC_FLAG_CBP_RD               = 0x04000000 #< Use rate distortion optimization for cbp.
-        CODEC_FLAG_QP_RD                = 0x08000000 #< Use rate distortion optimization for qp selectioon.
-        CODEC_FLAG_H263P_AIV            = 0x00000008 #< H.263 alternative inter VLC
-        CODEC_FLAG_OBMC                 = 0x00000001 #< OBMC
+        #CODEC_FLAG_H263P_UMV            = 0x02000000 #< unlimited motion vector
         CODEC_FLAG_LOOP_FILTER          = 0x00000800 #< loop filter
-        CODEC_FLAG_H263P_SLICE_STRUCT   = 0x10000000
         CODEC_FLAG_INTERLACED_ME        = 0x20000000 #< interlaced motion estimation
-        CODEC_FLAG_SVCD_SCAN_OFFSET     = 0x40000000 #< Will reserve space for SVCD scan offset user data.
         CODEC_FLAG_CLOSED_GOP           = 0x80000000
         CODEC_FLAG2_FAST                = 0x00000001 #< Allow non spec compliant speedup tricks.
-        CODEC_FLAG2_STRICT_GOP          = 0x00000002 #< Strictly enforce GOP size.
         CODEC_FLAG2_NO_OUTPUT           = 0x00000004 #< Skip bitstream encoding.
         CODEC_FLAG2_LOCAL_HEADER        = 0x00000008 #< Place global headers at every keyframe instead of in extradata.
-        CODEC_FLAG2_BPYRAMID            = 0x00000010 #< H.264 allow B-frames to be used as references.
-        CODEC_FLAG2_WPRED               = 0x00000020 #< H.264 weighted biprediction for B-frames
-        CODEC_FLAG2_MIXED_REFS          = 0x00000040 #< H.264 one reference per partition, as opposed to one reference per macroblock
-        CODEC_FLAG2_8X8DCT              = 0x00000080 #< H.264 high profile 8x8 transform
-        CODEC_FLAG2_FASTPSKIP           = 0x00000100 #< H.264 fast pskip
-        CODEC_FLAG2_AUD                 = 0x00000200 #< H.264 access unit delimiters
-        CODEC_FLAG2_BRDO                = 0x00000400 #< B-frame rate-distortion optimization
-        CODEC_FLAG2_INTRA_VLC           = 0x00000800 #< Use MPEG-2 intra VLC table.
-        CODEC_FLAG2_MEMC_ONLY           = 0x00001000 #< Only do ME/MC (I frames -> ref, P frame -> ME+MC).
-        CODEC_FLAG2_DROP_FRAME_TIMECODE = 0x00002000 #< timecode is in drop frame format.
-        CODEC_FLAG2_SKIP_RD             = 0x00004000 #< RD optimal MB level residual skipping
+        CODEC_FLAG2_DROP_FRAME_TIMECODE = 0x00002000 #< timecode is in drop frame format. DEPRECATED!!!!
+        CODEC_FLAG2_IGNORE_CROP         = 0x00010000 #< Discard cropping information from SPS.
         CODEC_FLAG2_CHUNKS              = 0x00008000 #< Input bitstream might be truncated at a packet boundaries instead of only at frame boundaries.
-        CODEC_FLAG2_NON_LINEAR_QUANT    = 0x00010000 #< Use MPEG-2 nonlinear quantizer.
-        CODEC_FLAG2_BIT_RESERVOIR       = 0x00020000 #< Use a bit reservoir when encoding if possible
-        CODEC_FLAG2_MBTREE              = 0x00040000 #< Use macroblock tree ratecontrol (x264 only)
-        CODEC_FLAG2_PSY                 = 0x00080000 #< Use psycho visual optimizations.
-        CODEC_FLAG2_SSIM                = 0x00100000 #< Compute SSIM during encoding, error[] values are undefined.
-        CODEC_FLAG2_INTRA_REFRESH       = 0x00200000 #< Use periodic insertion of intra blocks instead of keyframes.
+        CODEC_FLAG2_SHOW_ALL            = 0x00400000 #< Show all frames before the first keyframe
+        CODEC_FLAG2_EXPORT_MVS          = 0x10000000 #< Export motion vectors through frame side data
+        CODEC_FLAG2_SKIP_MANUAL         = 0x20000000 #< Do not skip samples and export skip information as frame side data
 
         # codec capabilities
         CODEC_CAP_DRAW_HORIZ_BAND       = 0x0001 #< Decoder can use draw_horiz_band callback.
         CODEC_CAP_DR1                   = 0x0002 
-        CODEC_CAP_PARSE_ONLY            = 0x0004
+        #CODEC_CAP_PARSE_ONLY            = 0x0004
         CODEC_CAP_TRUNCATED             = 0x0008
         CODEC_CAP_HWACCEL               = 0x0010
         CODEC_CAP_DELAY                 = 0x0020
@@ -392,8 +604,14 @@ cdef extern from "libavcodec/avcodec.h":
         CODEC_CAP_CHANNEL_CONF          = 0x0400
         CODEC_CAP_NEG_LINESIZES         = 0x0800
         CODEC_CAP_FRAME_THREADS         = 0x1000
+        CODEC_CAP_SLICE_THREADS         = 0x2000
+        CODEC_CAP_PARAM_CHANGE          = 0x4000
+        CODEC_CAP_AUTO_THREADS          = 0x8000
+        CODEC_CAP_VARIABLE_FRAME_SIZE   = 0x10000
+        CODEC_CAP_INTRA_ONLY            = 0x40000000
+        CODEC_CAP_LOSSLESS              = 0x80000000
 
-        # AVFrame pict_type values
+        # AVFrame pict_type values DEPRECATED use AVPictureType AV_PICTURE_TYPE_*
         FF_I_TYPE            = 1         #< Intra
         FF_P_TYPE            = 2         #< Predicted
         FF_B_TYPE            = 3         #< Bi-dir predicted
@@ -427,9 +645,96 @@ cdef extern from "libavcodec/avcodec.h":
         MB_TYPE_QUANT      = 0x00010000
         MB_TYPE_CBP        = 0x00020000
         
+        # AVCodecContext compression_level
+        FF_COMPRESSION_DEFAULT = -1
+
+        # AVCodecContext
+        FF_ASPECT_EXTENDED = 15
+
+        # AVCodecContext
+        FF_RC_STRATEGY_XVID = 1
+
+        # AVCodecContext prediction_method values
+        FF_PRED_LEFT   = 0
+        FF_PRED_PLANE  = 1
+        FF_PRED_MEDIAN = 2
+
+        # AVCodecContext ildct_cmp values
+        FF_CMP_SAD     = 0
+        FF_CMP_SSE     = 1
+        FF_CMP_SATD    = 2
+        FF_CMP_DCT     = 3
+        FF_CMP_PSNR    = 4
+        FF_CMP_BIT     = 5
+        FF_CMP_RD      = 6
+        FF_CMP_ZERO    = 7
+        FF_CMP_VSAD    = 8
+        FF_CMP_VSSE    = 9
+        FF_CMP_NSSE    = 10
+        FF_CMP_W53     = 11
+        FF_CMP_W97     = 12
+        FF_CMP_DCTMAX  = 13
+        FF_CMP_DCT264  = 14
+        FF_CMP_CHROMA  = 256        
+
+        # AVCodecContext dtg_active_format values
+        FF_DTG_AFD_SAME         = 8
+        FF_DTG_AFD_4_3          = 9
+        FF_DTG_AFD_16_9         =10
+        FF_DTG_AFD_14_9         =11
+        FF_DTG_AFD_4_3_SP_14_9  =13
+        FF_DTG_AFD_16_9_SP_14_9 =14
+        FF_DTG_AFD_SP_4_3       =15
+
+        # AVCodecContext intra_quant_bias values
+        FF_DEFAULT_QUANT_BIAS = 999999
+
+        # AVCodecContext slice_flags values
+        SLICE_FLAG_CODED_ORDER= 0x0001  #< draw_horiz_band() is called in coded order instead of display
+        SLICE_FLAG_ALLOW_FIELD= 0x0002  #< allow draw_horiz_band() with field slices (MPEG2 field pics)
+        SLICE_FLAG_ALLOW_PLANE= 0x0004  #< allow draw_horiz_band() with 1 component at a time (SVQ1)
+
+        # AVCodecContext mb_decision values
+        FF_MB_DECISION_SIMPLE = 0   #< uses mb_cmp
+        FF_MB_DECISION_BITS   = 1   #< chooses the one which needs the fewest bits
+        FF_MB_DECISION_RD     = 2   #< rate distortion
+
+        # AVCodecContext coder_type values
+        FF_CODER_TYPE_VLC     = 0
+        FF_CODER_TYPE_AC      = 1
+        FF_CODER_TYPE_RAW     = 2
+        FF_CODER_TYPE_RLE     = 3
+        FF_CODER_TYPE_DEFLATE = 4
+
+        # AVCodecContext workaround_bugs values
+        FF_BUG_AUTODETECT       = 1  #< autodetection
+        FF_BUG_OLD_MSMPEG4      = 2
+        FF_BUG_XVID_ILACE       = 4
+        FF_BUG_UMP4             = 8
+        FF_BUG_NO_PADDING       = 16
+        FF_BUG_AMV              = 32
+        FF_BUG_AC_VLC           = 0  #< Will be removed, libavcodec can now handle these non-compliant files by default.
+        FF_BUG_QPEL_CHROMA      = 64
+        FF_BUG_STD_QPEL         = 128
+        FF_BUG_QPEL_CHROMA2     = 256
+        FF_BUG_DIRECT_BLOCKSIZE = 512
+        FF_BUG_EDGE             = 1024
+        FF_BUG_HPEL_CHROMA      = 2048
+        FF_BUG_DC_CLIP          = 4096
+        FF_BUG_MS               = 8192 #< Work around various bugs in Microsoft's broken decoders.
+        FF_BUG_TRUNCATED        =16384
+
+        # AVCodecContext strict_std_compliance values
+        FF_COMPLIANCE_VERY_STRICT  =  2 #< Strictly conform to an older more strict version of the spec or reference software.
+        FF_COMPLIANCE_STRICT       =  1 #< Strictly conform to all the things in the spec no matter what consequences.
+        FF_COMPLIANCE_NORMAL       =  0
+        FF_COMPLIANCE_UNOFFICIAL   = -1 #< Allow unofficial extensions
+        FF_COMPLIANCE_EXPERIMENTAL = -2 #< Allow nonstandardized experimental things.
+
         # AVCodecContext error_concealment values
-        FF_EC_GUESS_MV       = 1
-        FF_EC_DEBLOCK        = 2
+        FF_EC_GUESS_MV      = 1
+        FF_EC_DEBLOCK       = 2
+        FF_EC_FAVOR_INTER   = 256
         
         # AVCodecContext debug values
         FF_DEBUG_PICT_INFO   = 1
@@ -445,414 +750,600 @@ cdef extern from "libavcodec/avcodec.h":
         FF_DEBUG_ER          = 0x00000400
         FF_DEBUG_MMCO        = 0x00000800
         FF_DEBUG_BUGS        = 0x00001000
-        FF_DEBUG_VIS_QP      = 0x00002000
-        FF_DEBUG_VIS_MB_TYPE = 0x00004000
+        FF_DEBUG_VIS_QP      = 0x00002000 #< only access through AVOptions from outside libavcodec
+        FF_DEBUG_VIS_MB_TYPE = 0x00004000 #< only access through AVOptions from outside libavcodec
         FF_DEBUG_BUFFERS     = 0x00008000
+        FF_DEBUG_THREADS     = 0x00010000
+        FF_DEBUG_NOMC        = 0x01000000
         
         # AVCodecContext debug_mv values
         FF_DEBUG_VIS_MV_P_FOR  = 0x00000001 #< visualize forward predicted MVs of P frames
         FF_DEBUG_VIS_MV_B_FOR  = 0x00000002 #< visualize forward predicted MVs of B frames
         FF_DEBUG_VIS_MV_B_BACK = 0x00000004 #< visualize backward predicted MVs of B frames
         
-        # AVCodecContex dtg_active_format values
-        FF_DTG_AFD_SAME        = 8
-        FF_DTG_AFD_4_3         = 9        #< 4:3
-        FF_DTG_AFD_16_9        = 10       #< 16:9
-        FF_DTG_AFD_14_9        = 11       #< 14:9
-        FF_DTG_AFD_4_3_SP_14_9 = 13 
-        FF_DTG_AFD_16_9_SP_14_9= 14
-        FF_DTG_AFD_SP_4_3      = 15
+        # AVCodecContex err_recognition values
+        AV_EF_CRCCHECK   =(1<<0)
+        AV_EF_BITSTREAM  =(1<<1)         #< detect bitstream specification deviations
+        AV_EF_BUFFER     =(1<<2)         #< detect improper bitstream length
+        AV_EF_EXPLODE    =(1<<3)         #< abort decoding on minor error detection
+        AV_EF_IGNORE_ERR =(1<<15)        #< ignore errors and continue
+        AV_EF_CAREFUL    =(1<<16)        #< consider things that violate the spec, are fast to calculate and have not been seen in the wild as errors
+        AV_EF_COMPLIANT  =(1<<17)        #< consider all spec non compliances as errors
+        AV_EF_AGGRESSIVE =(1<<18)        #< consider things that a sane encoder should not do as an error
+
+        # AVCodecContex dct_algo values
+        FF_DCT_AUTO    = 0
+        FF_DCT_FASTINT = 1
+        FF_DCT_INT     = 2
+        FF_DCT_MMX     = 3
+        FF_DCT_ALTIVEC = 5
+        FF_DCT_FAAN    = 6
+
+        # AVCodecContex idct_algo values
+        FF_IDCT_AUTO          = 0
+        FF_IDCT_INT           = 1
+        FF_IDCT_SIMPLE        = 2
+        FF_IDCT_SIMPLEMMX     = 3
+        FF_IDCT_ARM           = 7
+        FF_IDCT_ALTIVEC       = 8
+        FF_IDCT_SH4           = 9
+        FF_IDCT_SIMPLEARM     = 10
+        FF_IDCT_IPP           = 13
+        FF_IDCT_XVID          = 14
+        FF_IDCT_XVIDMMX       = 14
+        FF_IDCT_SIMPLEARMV5TE = 16
+        FF_IDCT_SIMPLEARMV6   = 17
+        FF_IDCT_SIMPLEVIS     = 18
+        FF_IDCT_FAAN          = 20
+        FF_IDCT_SIMPLENEON    = 22
+        FF_IDCT_SIMPLEALPHA   = 23
+        FF_IDCT_SIMPLEAUTO    = 128
+
+        # AVCodecContex thread_type values
+        FF_THREAD_FRAME  = 1 #< Decode more than one frame at once
+        FF_THREAD_SLICE  = 2 #< Decode more than one part of a single frame at once
 
         # AVCodecContex profile values
         FF_PROFILE_UNKNOWN     = -99
-    
-        FF_PROFILE_AAC_MAIN    = 0
-        FF_PROFILE_AAC_LOW     = 1
-        FF_PROFILE_AAC_SSR     = 2
-        FF_PROFILE_AAC_LTP     = 3
+        FF_PROFILE_RESERVED    = -100
 
-        FF_PROFILE_H264_BASELINE  = 66
-        FF_PROFILE_H264_MAIN      = 77
-        FF_PROFILE_H264_EXTENDED  = 88
-        FF_PROFILE_H264_HIGH      = 100
-        FF_PROFILE_H264_HIGH_10   = 110
-        FF_PROFILE_H264_HIGH_422  = 122
-        FF_PROFILE_H264_HIGH_444  = 244
-        FF_PROFILE_H264_CAVLC_444 = 44
-        
+        FF_PROFILE_AAC_MAIN= 0
+        FF_PROFILE_AAC_LOW = 1
+        FF_PROFILE_AAC_SSR = 2
+        FF_PROFILE_AAC_LTP = 3
+        FF_PROFILE_AAC_HE  = 4
+        FF_PROFILE_AAC_HE_V2 =28
+        FF_PROFILE_AAC_LD   =22
+        FF_PROFILE_AAC_ELD  =38
+        FF_PROFILE_MPEG2_AAC_LOW=128
+        FF_PROFILE_MPEG2_AAC_HE =131
+
+        FF_PROFILE_DTS         = 20
+        FF_PROFILE_DTS_ES      = 30
+        FF_PROFILE_DTS_96_24   = 40
+        FF_PROFILE_DTS_HD_HRA  = 50
+        FF_PROFILE_DTS_HD_MA   = 60
+
+        FF_PROFILE_MPEG2_422    = 0
+        FF_PROFILE_MPEG2_HIGH   = 1
+        FF_PROFILE_MPEG2_SS     = 2
+        FF_PROFILE_MPEG2_SNR_SCALABLE  = 3
+        FF_PROFILE_MPEG2_MAIN   = 4
+        FF_PROFILE_MPEG2_SIMPLE = 5
+
+        FF_PROFILE_H264_CONSTRAINED = (1<<9)  # 8+1; constraint_set1_flag
+        FF_PROFILE_H264_INTRA       = (1<<11) # 8+3; constraint_set3_flag
+
+        FF_PROFILE_H264_BASELINE            = 66
+        FF_PROFILE_H264_CONSTRAINED_BASELINE= (66|FF_PROFILE_H264_CONSTRAINED)
+        FF_PROFILE_H264_MAIN                = 77
+        FF_PROFILE_H264_EXTENDED            = 88
+        FF_PROFILE_H264_HIGH                = 100
+        FF_PROFILE_H264_HIGH_10             = 110
+        FF_PROFILE_H264_HIGH_10_INTRA       = (110|FF_PROFILE_H264_INTRA)
+        FF_PROFILE_H264_HIGH_422            = 122
+        FF_PROFILE_H264_HIGH_422_INTRA      = (122|FF_PROFILE_H264_INTRA)
+        FF_PROFILE_H264_HIGH_444            = 144
+        FF_PROFILE_H264_HIGH_444_PREDICTIVE = 244
+        FF_PROFILE_H264_HIGH_444_INTRA      = (244|FF_PROFILE_H264_INTRA)
+        FF_PROFILE_H264_CAVLC_444           = 44
+
+        FF_PROFILE_VC1_SIMPLE   = 0
+        FF_PROFILE_VC1_MAIN     = 1
+        FF_PROFILE_VC1_COMPLEX  = 2
+        FF_PROFILE_VC1_ADVANCED = 3
+
+        FF_PROFILE_MPEG4_SIMPLE                    =  0
+        FF_PROFILE_MPEG4_SIMPLE_SCALABLE           =  1
+        FF_PROFILE_MPEG4_CORE                      =  2
+        FF_PROFILE_MPEG4_MAIN                      =  3
+        FF_PROFILE_MPEG4_N_BIT                     =  4
+        FF_PROFILE_MPEG4_SCALABLE_TEXTURE          =  5
+        FF_PROFILE_MPEG4_SIMPLE_FACE_ANIMATION     =  6
+        FF_PROFILE_MPEG4_BASIC_ANIMATED_TEXTURE    =  7
+        FF_PROFILE_MPEG4_HYBRID                    =  8
+        FF_PROFILE_MPEG4_ADVANCED_REAL_TIME        =  9
+        FF_PROFILE_MPEG4_CORE_SCALABLE             = 10
+        FF_PROFILE_MPEG4_ADVANCED_CODING           = 11
+        FF_PROFILE_MPEG4_ADVANCED_CORE             = 12
+        FF_PROFILE_MPEG4_ADVANCED_SCALABLE_TEXTURE = 13
+        FF_PROFILE_MPEG4_SIMPLE_STUDIO             = 14
+        FF_PROFILE_MPEG4_ADVANCED_SIMPLE           = 15
+
+        FF_PROFILE_JPEG2000_CSTREAM_RESTRICTION_0  = 0
+        FF_PROFILE_JPEG2000_CSTREAM_RESTRICTION_1  = 1
+        FF_PROFILE_JPEG2000_CSTREAM_NO_RESTRICTION = 2
+        FF_PROFILE_JPEG2000_DCINEMA_2K             = 3
+        FF_PROFILE_JPEG2000_DCINEMA_4K             = 4
+
+        FF_PROFILE_HEVC_MAIN                       = 1
+        FF_PROFILE_HEVC_MAIN_10                    = 2
+        FF_PROFILE_HEVC_MAIN_STILL_PICTURE         = 3
+        FF_PROFILE_HEVC_REXT                       = 4
+
         FF_LEVEL_UNKNOWN       = -99
-        
-        
-    # ok libavcodec   52.113. 2    
+
+        # AVCodecContex sub_charenc_mode values
+        FF_SUB_CHARENC_MODE_DO_NOTHING  = -1  #< do nothing (demuxer outputs a stream supposed to be already in UTF-8, or the codec is bitmap for instance)
+        FF_SUB_CHARENC_MODE_AUTOMATIC   =  0  #< libavcodec will select the mode itself
+        FF_SUB_CHARENC_MODE_PRE_DECODER =  1  #< the AVPacket data needs to be recoded to UTF-8 before being fed to the decoder, requires iconv
+
+    # ok libavcodec/avcodec.h   56. 26.100
     enum AVDiscard:
-        # we leave some space between them for extensions (drop some keyframes for intra only or drop just some bidir frames)
         AVDISCARD_NONE   = -16 # discard nothing
         AVDISCARD_DEFAULT=   0 # discard useless packets like 0 size packets in avi
         AVDISCARD_NONREF =   8 # discard all non reference
         AVDISCARD_BIDIR  =  16 # discard all bidirectional frames
+        AVDISCARD_NONINTRA= 24 # discard all non intra frames
         AVDISCARD_NONKEY =  32 # discard all frames except keyframes
         AVDISCARD_ALL    =  48 # discard all
 
-    # ok libavcodec   52.113. 2
-    enum AVColorPrimaries:
-        AVCOL_PRI_BT709       = 1    #< also ITU-R BT1361 / IEC 61966-2-4 / SMPTE RP177 Annex B
-        AVCOL_PRI_UNSPECIFIED = 2
-        AVCOL_PRI_BT470M      = 4
-        AVCOL_PRI_BT470BG     = 5    #< also ITU-R BT601-6 625 / ITU-R BT1358 625 / ITU-R BT1700 625 PAL & SECAM
-        AVCOL_PRI_SMPTE170M   = 6    #< also ITU-R BT601-6 525 / ITU-R BT1358 525 / ITU-R BT1700 NTSC
-        AVCOL_PRI_SMPTE240M   = 7    #< functionally identical to above
-        AVCOL_PRI_FILM        = 8
-        AVCOL_PRI_NB          = 9    #< Not part of ABI
-      
-      
-    # ok libavcodec   52.113. 2       
-    enum AVColorTransferCharacteristic:
-        AVCOL_TRC_BT709       = 1    #< also ITU-R BT1361
-        AVCOL_TRC_UNSPECIFIED = 2
-        AVCOL_TRC_GAMMA22     = 4    #< also ITU-R BT470M / ITU-R BT1700 625 PAL & SECAM
-        AVCOL_TRC_GAMMA28     = 5    #< also ITU-R BT470BG
-        AVCOL_TRC_NB          = 6    #< Not part of ABI
-
-
-    # ok libavcodec   52.113. 2
-    enum AVColorSpace:
-        AVCOL_SPC_RGB         = 0
-        AVCOL_SPC_BT709       = 1    #< also ITU-R BT1361 / IEC 61966-2-4 xvYCC709 / SMPTE RP177 Annex B
-        AVCOL_SPC_UNSPECIFIED = 2
-        AVCOL_SPC_FCC         = 4
-        AVCOL_SPC_BT470BG     = 5    #< also ITU-R BT601-6 625 / ITU-R BT1358 625 / ITU-R BT1700 625 PAL & SECAM / IEC 61966-2-4 xvYCC601
-        AVCOL_SPC_SMPTE170M   = 6    #< also ITU-R BT601-6 525 / ITU-R BT1358 525 / ITU-R BT1700 NTSC / functionally identical to above
-        AVCOL_SPC_SMPTE240M   = 7
-        AVCOL_SPC_NB          = 8    #< Not part of ABI
-
-
-    # ok libavcodec   52.113. 2
-    enum AVColorRange:
-        AVCOL_RANGE_UNSPECIFIED = 0
-        AVCOL_RANGE_MPEG        = 1  #< the normal 219*2^(n-8) "MPEG" YUV ranges
-        AVCOL_RANGE_JPEG        = 2  #< the normal     2^n-1   "JPEG" YUV ranges
-        AVCOL_RANGE_NB          = 3  #< Not part of ABI
-
-
-    # ok libavcodec   52.113. 2
-    enum AVChromaLocation:
-        AVCHROMA_LOC_UNSPECIFIED = 0
-        AVCHROMA_LOC_LEFT        = 1    #< mpeg2/4, h264 default
-        AVCHROMA_LOC_CENTER      = 2    #< mpeg1, jpeg, h263
-        AVCHROMA_LOC_TOPLEFT     = 3    #< DV
-        AVCHROMA_LOC_TOP         = 4
-        AVCHROMA_LOC_BOTTOMLEFT  = 5
-        AVCHROMA_LOC_BOTTOM      = 6
-        AVCHROMA_LOC_NB          = 7    #< Not part of ABI
-
-
-    # ok libavcodec   52.113. 2
-    enum CodecID:
-        CODEC_ID_NONE,
+    # ok libavcodec   56. 26.100
+    enum AVCodecID:
+        AV_CODEC_ID_NONE,
     
         # video codecs 
-        CODEC_ID_MPEG1VIDEO,
-        CODEC_ID_MPEG2VIDEO, #< preferred ID for MPEG-1/2 video decoding
-        CODEC_ID_MPEG2VIDEO_XVMC,
-        CODEC_ID_H261,
-        CODEC_ID_H263,
-        CODEC_ID_RV10,
-        CODEC_ID_RV20,
-        CODEC_ID_MJPEG,
-        CODEC_ID_MJPEGB,
-        CODEC_ID_LJPEG,
-        CODEC_ID_SP5X,
-        CODEC_ID_JPEGLS,
-        CODEC_ID_MPEG4,
-        CODEC_ID_RAWVIDEO,
-        CODEC_ID_MSMPEG4V1,
-        CODEC_ID_MSMPEG4V2,
-        CODEC_ID_MSMPEG4V3,
-        CODEC_ID_WMV1,
-        CODEC_ID_WMV2,
-        CODEC_ID_H263P,
-        CODEC_ID_H263I,
-        CODEC_ID_FLV1,
-        CODEC_ID_SVQ1,
-        CODEC_ID_SVQ3,
-        CODEC_ID_DVVIDEO,
-        CODEC_ID_HUFFYUV,
-        CODEC_ID_CYUV,
-        CODEC_ID_H264,
-        CODEC_ID_INDEO3,
-        CODEC_ID_VP3,
-        CODEC_ID_THEORA,
-        CODEC_ID_ASV1,
-        CODEC_ID_ASV2,
-        CODEC_ID_FFV1,
-        CODEC_ID_4XM,
-        CODEC_ID_VCR1,
-        CODEC_ID_CLJR,
-        CODEC_ID_MDEC,
-        CODEC_ID_ROQ,
-        CODEC_ID_INTERPLAY_VIDEO,
-        CODEC_ID_XAN_WC3,
-        CODEC_ID_XAN_WC4,
-        CODEC_ID_RPZA,
-        CODEC_ID_CINEPAK,
-        CODEC_ID_WS_VQA,
-        CODEC_ID_MSRLE,
-        CODEC_ID_MSVIDEO1,
-        CODEC_ID_IDCIN,
-        CODEC_ID_8BPS,
-        CODEC_ID_SMC,
-        CODEC_ID_FLIC,
-        CODEC_ID_TRUEMOTION1,
-        CODEC_ID_VMDVIDEO,
-        CODEC_ID_MSZH,
-        CODEC_ID_ZLIB,
-        CODEC_ID_QTRLE,
-        CODEC_ID_SNOW,
-        CODEC_ID_TSCC,
-        CODEC_ID_ULTI,
-        CODEC_ID_QDRAW,
-        CODEC_ID_VIXL,
-        CODEC_ID_QPEG,
-        CODEC_ID_XVID,        #< LIBAVCODEC_VERSION_MAJOR < 53
-        CODEC_ID_PNG,
-        CODEC_ID_PPM,
-        CODEC_ID_PBM,
-        CODEC_ID_PGM,
-        CODEC_ID_PGMYUV,
-        CODEC_ID_PAM,
-        CODEC_ID_FFVHUFF,
-        CODEC_ID_RV30,
-        CODEC_ID_RV40,
-        CODEC_ID_VC1,
-        CODEC_ID_WMV3,
-        CODEC_ID_LOCO,
-        CODEC_ID_WNV1,
-        CODEC_ID_AASC,
-        CODEC_ID_INDEO2,
-        CODEC_ID_FRAPS,
-        CODEC_ID_TRUEMOTION2,
-        CODEC_ID_BMP,
-        CODEC_ID_CSCD,
-        CODEC_ID_MMVIDEO,
-        CODEC_ID_ZMBV,
-        CODEC_ID_AVS,
-        CODEC_ID_SMACKVIDEO,
-        CODEC_ID_NUV,
-        CODEC_ID_KMVC,
-        CODEC_ID_FLASHSV,
-        CODEC_ID_CAVS,
-        CODEC_ID_JPEG2000,
-        CODEC_ID_VMNC,
-        CODEC_ID_VP5,
-        CODEC_ID_VP6,
-        CODEC_ID_VP6F,
-        CODEC_ID_TARGA,
-        CODEC_ID_DSICINVIDEO,
-        CODEC_ID_TIERTEXSEQVIDEO,
-        CODEC_ID_TIFF,
-        CODEC_ID_GIF,
-        CODEC_ID_FFH264,
-        CODEC_ID_DXA,
-        CODEC_ID_DNXHD,
-        CODEC_ID_THP,
-        CODEC_ID_SGI,
-        CODEC_ID_C93,
-        CODEC_ID_BETHSOFTVID,
-        CODEC_ID_PTX,
-        CODEC_ID_TXD,
-        CODEC_ID_VP6A,
-        CODEC_ID_AMV,
-        CODEC_ID_VB,
-        CODEC_ID_PCX,
-        CODEC_ID_SUNRAST,
-        CODEC_ID_INDEO4,
-        CODEC_ID_INDEO5,
-        CODEC_ID_MIMIC,
-        CODEC_ID_RL2,
-        CODEC_ID_8SVX_EXP,
-        CODEC_ID_8SVX_FIB,
-        CODEC_ID_ESCAPE124,
-        CODEC_ID_DIRAC,
-        CODEC_ID_BFI,
-        CODEC_ID_CMV,
-        CODEC_ID_MOTIONPIXELS,
-        CODEC_ID_TGV,
-        CODEC_ID_TGQ,
-        CODEC_ID_TQI,
-        CODEC_ID_AURA,
-        CODEC_ID_AURA2,
-        CODEC_ID_V210X,
-        CODEC_ID_TMV,
-        CODEC_ID_V210,
-        CODEC_ID_DPX,
-        CODEC_ID_MAD,
-        CODEC_ID_FRWU,
-        CODEC_ID_FLASHSV2,
-        CODEC_ID_CDGRAPHICS,
-        CODEC_ID_R210,
-        CODEC_ID_ANM,
-        CODEC_ID_BINKVIDEO,
-        CODEC_ID_IFF_ILBM,
-        CODEC_ID_IFF_BYTERUN1,
-        CODEC_ID_KGV1,
-        CODEC_ID_YOP,
-        CODEC_ID_VP8,
-        CODEC_ID_PICTOR,
-        CODEC_ID_ANSI,
-        CODEC_ID_A64_MULTI,
-        CODEC_ID_A64_MULTI5,
-        CODEC_ID_R10K,
-        CODEC_ID_MXPEG,
-        CODEC_ID_LAGARITH,
-        CODEC_ID_PRORES,
+        AV_CODEC_ID_MPEG1VIDEO,
+        AV_CODEC_ID_MPEG2VIDEO, #< preferred ID for MPEG-1/2 video decoding
+        AV_CODEC_ID_MPEG2VIDEO_XVMC,
+        AV_CODEC_ID_H261,
+        AV_CODEC_ID_H263,
+        AV_CODEC_ID_RV10,
+        AV_CODEC_ID_RV20,
+        AV_CODEC_ID_MJPEG,
+        AV_CODEC_ID_MJPEGB,
+        AV_CODEC_ID_LJPEG,
+        AV_CODEC_ID_SP5X,
+        AV_CODEC_ID_JPEGLS,
+        AV_CODEC_ID_MPEG4,
+        AV_CODEC_ID_RAWVIDEO,
+        AV_CODEC_ID_MSMPEG4V1,
+        AV_CODEC_ID_MSMPEG4V2,
+        AV_CODEC_ID_MSMPEG4V3,
+        AV_CODEC_ID_WMV1,
+        AV_CODEC_ID_WMV2,
+        AV_CODEC_ID_H263P,
+        AV_CODEC_ID_H263I,
+        AV_CODEC_ID_FLV1,
+        AV_CODEC_ID_SVQ1,
+        AV_CODEC_ID_SVQ3,
+        AV_CODEC_ID_DVVIDEO,
+        AV_CODEC_ID_HUFFYUV,
+        AV_CODEC_ID_CYUV,
+        AV_CODEC_ID_H264,
+        AV_CODEC_ID_INDEO3,
+        AV_CODEC_ID_VP3,
+        AV_CODEC_ID_THEORA,
+        AV_CODEC_ID_ASV1,
+        AV_CODEC_ID_ASV2,
+        AV_CODEC_ID_FFV1,
+        AV_CODEC_ID_4XM,
+        AV_CODEC_ID_VCR1,
+        AV_CODEC_ID_CLJR,
+        AV_CODEC_ID_MDEC,
+        AV_CODEC_ID_ROQ,
+        AV_CODEC_ID_INTERPLAY_VIDEO,
+        AV_CODEC_ID_XAN_WC3,
+        AV_CODEC_ID_XAN_WC4,
+        AV_CODEC_ID_RPZA,
+        AV_CODEC_ID_CINEPAK,
+        AV_CODEC_ID_WS_VQA,
+        AV_CODEC_ID_MSRLE,
+        AV_CODEC_ID_MSVIDEO1,
+        AV_CODEC_ID_IDCIN,
+        AV_CODEC_ID_8BPS,
+        AV_CODEC_ID_SMC,
+        AV_CODEC_ID_FLIC,
+        AV_CODEC_ID_TRUEMOTION1,
+        AV_CODEC_ID_VMDVIDEO,
+        AV_CODEC_ID_MSZH,
+        AV_CODEC_ID_ZLIB,
+        AV_CODEC_ID_QTRLE,
+        AV_CODEC_ID_SNOW,
+        AV_CODEC_ID_TSCC,
+        AV_CODEC_ID_ULTI,
+        AV_CODEC_ID_QDRAW,
+        AV_CODEC_ID_VIXL,
+        AV_CODEC_ID_QPEG,
+        AV_CODEC_ID_XVID,        #< LIBAVCODEC_VERSION_MAJOR < 53
+        AV_CODEC_ID_PNG,
+        AV_CODEC_ID_PPM,
+        AV_CODEC_ID_PBM,
+        AV_CODEC_ID_PGM,
+        AV_CODEC_ID_PGMYUV,
+        AV_CODEC_ID_PAM,
+        AV_CODEC_ID_FFVHUFF,
+        AV_CODEC_ID_RV30,
+        AV_CODEC_ID_RV40,
+        AV_CODEC_ID_VC1,
+        AV_CODEC_ID_WMV3,
+        AV_CODEC_ID_LOCO,
+        AV_CODEC_ID_WNV1,
+        AV_CODEC_ID_AASC,
+        AV_CODEC_ID_INDEO2,
+        AV_CODEC_ID_FRAPS,
+        AV_CODEC_ID_TRUEMOTION2,
+        AV_CODEC_ID_BMP,
+        AV_CODEC_ID_CSCD,
+        AV_CODEC_ID_MMVIDEO,
+        AV_CODEC_ID_ZMBV,
+        AV_CODEC_ID_AVS,
+        AV_CODEC_ID_SMACKVIDEO,
+        AV_CODEC_ID_NUV,
+        AV_CODEC_ID_KMVC,
+        AV_CODEC_ID_FLASHSV,
+        AV_CODEC_ID_CAVS,
+        AV_CODEC_ID_JPEG2000,
+        AV_CODEC_ID_VMNC,
+        AV_CODEC_ID_VP5,
+        AV_CODEC_ID_VP6,
+        AV_CODEC_ID_VP6F,
+        AV_CODEC_ID_TARGA,
+        AV_CODEC_ID_DSICINVIDEO,
+        AV_CODEC_ID_TIERTEXSEQVIDEO,
+        AV_CODEC_ID_TIFF,
+        AV_CODEC_ID_GIF,
+        AV_CODEC_ID_FFH264,
+        AV_CODEC_ID_DXA,
+        AV_CODEC_ID_DNXHD,
+        AV_CODEC_ID_THP,
+        AV_CODEC_ID_SGI,
+        AV_CODEC_ID_C93,
+        AV_CODEC_ID_BETHSOFTVID,
+        AV_CODEC_ID_PTX,
+        AV_CODEC_ID_TXD,
+        AV_CODEC_ID_VP6A,
+        AV_CODEC_ID_AMV,
+        AV_CODEC_ID_VB,
+        AV_CODEC_ID_PCX,
+        AV_CODEC_ID_SUNRAST,
+        AV_CODEC_ID_INDEO4,
+        AV_CODEC_ID_INDEO5,
+        AV_CODEC_ID_MIMIC,
+        AV_CODEC_ID_RL2,
+        AV_CODEC_ID_8SVX_EXP,
+        AV_CODEC_ID_8SVX_FIB,
+        AV_CODEC_ID_ESCAPE124,
+        AV_CODEC_ID_DIRAC,
+        AV_CODEC_ID_BFI,
+        AV_CODEC_ID_CMV,
+        AV_CODEC_ID_MOTIONPIXELS,
+        AV_CODEC_ID_TGV,
+        AV_CODEC_ID_TGQ,
+        AV_CODEC_ID_TQI,
+        AV_CODEC_ID_AURA,
+        AV_CODEC_ID_AURA2,
+        AV_CODEC_ID_V210X,
+        AV_CODEC_ID_TMV,
+        AV_CODEC_ID_V210,
+        AV_CODEC_ID_DPX,
+        AV_CODEC_ID_MAD,
+        AV_CODEC_ID_FRWU,
+        AV_CODEC_ID_FLASHSV2,
+        AV_CODEC_ID_CDGRAPHICS,
+        AV_CODEC_ID_R210,
+        AV_CODEC_ID_ANM,
+        AV_CODEC_ID_BINKVIDEO,
+        AV_CODEC_ID_IFF_ILBM,
+        AV_CODEC_ID_IFF_BYTERUN1,
+        AV_CODEC_ID_KGV1,
+        AV_CODEC_ID_YOP,
+        AV_CODEC_ID_VP8,
+        AV_CODEC_ID_PICTOR,
+        AV_CODEC_ID_ANSI,
+        AV_CODEC_ID_A64_MULTI,
+        AV_CODEC_ID_A64_MULTI5,
+        AV_CODEC_ID_R10K,
+        AV_CODEC_ID_MXPEG,
+        AV_CODEC_ID_LAGARITH,
+        AV_CODEC_ID_PRORES,
+        AV_CODEC_ID_JV,
+        AV_CODEC_ID_DFA,
+        AV_CODEC_ID_WMV3IMAGE,
+        AV_CODEC_ID_VC1IMAGE,
+        AV_CODEC_ID_UTVIDEO,
+        AV_CODEC_ID_BMV_VIDEO,
+        AV_CODEC_ID_VBLE,
+        AV_CODEC_ID_DXTORY,
+        AV_CODEC_ID_V410,
+        AV_CODEC_ID_XWD,
+        AV_CODEC_ID_CDXL,
+        AV_CODEC_ID_XBM,
+        AV_CODEC_ID_ZEROCODEC,
+        AV_CODEC_ID_MSS1,
+        AV_CODEC_ID_MSA1,
+        AV_CODEC_ID_TSCC2,
+        AV_CODEC_ID_MTS2,
+        AV_CODEC_ID_CLLC,
+        AV_CODEC_ID_MSS2,
+        AV_CODEC_ID_VP9,
+        AV_CODEC_ID_AIC,
+        AV_CODEC_ID_ESCAPE130_DEPRECATED,
+        AV_CODEC_ID_G2M_DEPRECATED,
+        AV_CODEC_ID_WEBP_DEPRECATED,
+        AV_CODEC_ID_HNM4_VIDEO,
+        AV_CODEC_ID_HEVC_DEPRECATED,
+        AV_CODEC_ID_FIC,
+        AV_CODEC_ID_ALIAS_PIX,
+        AV_CODEC_ID_BRENDER_PIX_DEPRECATED,
+        AV_CODEC_ID_PAF_VIDEO_DEPRECATED,
+        AV_CODEC_ID_EXR_DEPRECATED,
+        AV_CODEC_ID_VP7_DEPRECATED,
+        AV_CODEC_ID_SANM_DEPRECATED,
+        AV_CODEC_ID_SGIRLE_DEPRECATED,
+        AV_CODEC_ID_MVC1_DEPRECATED,
+        AV_CODEC_ID_MVC2_DEPRECATED,
+        AV_CODEC_ID_HQX,
         
+        AV_CODEC_ID_BRENDER_PIX = 0x42504958, # MKBETAG('B','P','I','X')
+        AV_CODEC_ID_Y41P        = 0x59343150, # MKBETAG('Y','4','1','P')
+        AV_CODEC_ID_ESCAPE130   = 0x45313330, # MKBETAG('E','1','3','0')
+        AV_CODEC_ID_EXR         = 0x30455852, # MKBETAG('0','E','X','R')
+        AV_CODEC_ID_AVRP        = 0x41565250, # MKBETAG('A','V','R','P')
+
+        AV_CODEC_ID_012V        = 0x30313256, # MKBETAG('0','1','2','V')
+        AV_CODEC_ID_G2M         = 0x47324d, # MKBETAG(0,'G','2','M')
+        AV_CODEC_ID_AVUI        = 0x41565549, # MKBETAG('A','V','U','I')
+        AV_CODEC_ID_AYUV        = 0x41595556, # MKBETAG('A','Y','U','V')
+        AV_CODEC_ID_TARGA_Y216  = 0x54323136, # MKBETAG('T','2','1','6')
+        AV_CODEC_ID_V308        = 0x56333038, # MKBETAG('V','3','0','8')
+        AV_CODEC_ID_V408        = 0x56343038, # MKBETAG('V','4','0','8')
+        AV_CODEC_ID_YUV4        = 0x59555634, # MKBETAG('Y','U','V','4')
+        AV_CODEC_ID_SANM        = 0x53414e4d, # MKBETAG('S','A','N','M')
+        AV_CODEC_ID_PAF_VIDEO   = 0x50414656, # MKBETAG('P','A','F','V')
+        AV_CODEC_ID_AVRN        = 0x4156526e, # MKBETAG('A','V','R','n')
+        AV_CODEC_ID_CPIA        = 0x43504941, # MKBETAG('C','P','I','A')
+        AV_CODEC_ID_XFACE       = 0x58464143, # MKBETAG('X','F','A','C')
+        AV_CODEC_ID_SGIRLE      = 0x53474952, # MKBETAG('S','G','I','R')
+        AV_CODEC_ID_MVC1        = 0x4d564331, # MKBETAG('M','V','C','1')
+        AV_CODEC_ID_MVC2        = 0x4d564332, # MKBETAG('M','V','C','2')
+        AV_CODEC_ID_SNOW        = 0x534e4f57, # MKBETAG('S','N','O','W')
+        AV_CODEC_ID_WEBP        = 0x57454250, # MKBETAG('W','E','B','P')
+        AV_CODEC_ID_SMVJPEG     = 0x534d564a, # MKBETAG('S','M','V','J')
+        AV_CODEC_ID_HEVC        = 0x48323635, # MKBETAG('H','2','6','5')
+        AV_CODEC_ID_VP7         = 0x56503730, # MKBETAG('V','P','7','0')
+        AV_CODEC_ID_APNG        = 0x41504e47, # MKBETAG('A','P','N','G')
+
         # various PCM "codecs" 
-        CODEC_ID_PCM_S16LE= 0x10000,
-        CODEC_ID_PCM_S16BE,
-        CODEC_ID_PCM_U16LE,
-        CODEC_ID_PCM_U16BE,
-        CODEC_ID_PCM_S8,
-        CODEC_ID_PCM_U8,
-        CODEC_ID_PCM_MULAW,
-        CODEC_ID_PCM_ALAW,
-        CODEC_ID_PCM_S32LE,
-        CODEC_ID_PCM_S32BE,
-        CODEC_ID_PCM_U32LE,
-        CODEC_ID_PCM_U32BE,
-        CODEC_ID_PCM_S24LE,
-        CODEC_ID_PCM_S24BE,
-        CODEC_ID_PCM_U24LE,
-        CODEC_ID_PCM_U24BE,
-        CODEC_ID_PCM_S24DAUD,
-        CODEC_ID_PCM_ZORK,
-        CODEC_ID_PCM_S16LE_PLANAR,
-        CODEC_ID_PCM_DVD,
-        CODEC_ID_PCM_F32BE,
-        CODEC_ID_PCM_F32LE,
-        CODEC_ID_PCM_F64BE,
-        CODEC_ID_PCM_F64LE,
-        CODEC_ID_PCM_BLURAY,
-        CODEC_ID_PCM_LXF,
+        AV_CODEC_ID_FIRST_AUDIO= 0x10000,     #< A dummy id pointing at the start of audio codecs
+        AV_CODEC_ID_PCM_S16LE= 0x10000,
+        AV_CODEC_ID_PCM_S16BE,
+        AV_CODEC_ID_PCM_U16LE,
+        AV_CODEC_ID_PCM_U16BE,
+        AV_CODEC_ID_PCM_S8,
+        AV_CODEC_ID_PCM_U8,
+        AV_CODEC_ID_PCM_MULAW,
+        AV_CODEC_ID_PCM_ALAW,
+        AV_CODEC_ID_PCM_S32LE,
+        AV_CODEC_ID_PCM_S32BE,
+        AV_CODEC_ID_PCM_U32LE,
+        AV_CODEC_ID_PCM_U32BE,
+        AV_CODEC_ID_PCM_S24LE,
+        AV_CODEC_ID_PCM_S24BE,
+        AV_CODEC_ID_PCM_U24LE,
+        AV_CODEC_ID_PCM_U24BE,
+        AV_CODEC_ID_PCM_S24DAUD,
+        AV_CODEC_ID_PCM_ZORK,
+        AV_CODEC_ID_PCM_S16LE_PLANAR,
+        AV_CODEC_ID_PCM_DVD,
+        AV_CODEC_ID_PCM_F32BE,
+        AV_CODEC_ID_PCM_F32LE,
+        AV_CODEC_ID_PCM_F64BE,
+        AV_CODEC_ID_PCM_F64LE,
+        AV_CODEC_ID_PCM_BLURAY,
+        AV_CODEC_ID_PCM_LXF,
+        AV_CODEC_ID_S302M,
+        AV_CODEC_ID_PCM_S8_PLANAR,
+        AV_CODEC_ID_PCM_S24LE_PLANAR_DEPRECATED,
+        AV_CODEC_ID_PCM_S32LE_PLANAR_DEPRECATED,
+        AV_CODEC_ID_PCM_S24LE_PLANAR= 0x18505350, # MKBETAG(24,'P','S','P')
+        AV_CODEC_ID_PCM_S32LE_PLANAR= 0x20505350, # MKBETAG(32,'P','S','P')
+        AV_CODEC_ID_PCM_S16BE_PLANAR= 0x50535010, # MKBETAG('P','S','P',16)
        
          # various ADPCM codecs 
-        CODEC_ID_ADPCM_IMA_QT= 0x11000,
-        CODEC_ID_ADPCM_IMA_WAV,
-        CODEC_ID_ADPCM_IMA_DK3,
-        CODEC_ID_ADPCM_IMA_DK4,
-        CODEC_ID_ADPCM_IMA_WS,
-        CODEC_ID_ADPCM_IMA_SMJPEG,
-        CODEC_ID_ADPCM_MS,
-        CODEC_ID_ADPCM_4XM,
-        CODEC_ID_ADPCM_XA,
-        CODEC_ID_ADPCM_ADX,
-        CODEC_ID_ADPCM_EA,
-        CODEC_ID_ADPCM_G726,
-        CODEC_ID_ADPCM_CT,
-        CODEC_ID_ADPCM_SWF,
-        CODEC_ID_ADPCM_YAMAHA,
-        CODEC_ID_ADPCM_SBPRO_4,
-        CODEC_ID_ADPCM_SBPRO_3,
-        CODEC_ID_ADPCM_SBPRO_2,
-        CODEC_ID_ADPCM_THP,
-        CODEC_ID_ADPCM_IMA_AMV,
-        CODEC_ID_ADPCM_EA_R1,
-        CODEC_ID_ADPCM_EA_R3,
-        CODEC_ID_ADPCM_EA_R2,
-        CODEC_ID_ADPCM_IMA_EA_SEAD,
-        CODEC_ID_ADPCM_IMA_EA_EACS,
-        CODEC_ID_ADPCM_EA_XAS,
-        CODEC_ID_ADPCM_EA_MAXIS_XA,
-        CODEC_ID_ADPCM_IMA_ISS,
-        CODEC_ID_ADPCM_G722,
+        AV_CODEC_ID_ADPCM_IMA_QT = 0x11000,
+        AV_CODEC_ID_ADPCM_IMA_WAV,
+        AV_CODEC_ID_ADPCM_IMA_DK3,
+        AV_CODEC_ID_ADPCM_IMA_DK4,
+        AV_CODEC_ID_ADPCM_IMA_WS,
+        AV_CODEC_ID_ADPCM_IMA_SMJPEG,
+        AV_CODEC_ID_ADPCM_MS,
+        AV_CODEC_ID_ADPCM_4XM,
+        AV_CODEC_ID_ADPCM_XA,
+        AV_CODEC_ID_ADPCM_ADX,
+        AV_CODEC_ID_ADPCM_EA,
+        AV_CODEC_ID_ADPCM_G726,
+        AV_CODEC_ID_ADPCM_CT,
+        AV_CODEC_ID_ADPCM_SWF,
+        AV_CODEC_ID_ADPCM_YAMAHA,
+        AV_CODEC_ID_ADPCM_SBPRO_4,
+        AV_CODEC_ID_ADPCM_SBPRO_3,
+        AV_CODEC_ID_ADPCM_SBPRO_2,
+        AV_CODEC_ID_ADPCM_THP,
+        AV_CODEC_ID_ADPCM_IMA_AMV,
+        AV_CODEC_ID_ADPCM_EA_R1,
+        AV_CODEC_ID_ADPCM_EA_R3,
+        AV_CODEC_ID_ADPCM_EA_R2,
+        AV_CODEC_ID_ADPCM_IMA_EA_SEAD,
+        AV_CODEC_ID_ADPCM_IMA_EA_EACS,
+        AV_CODEC_ID_ADPCM_EA_XAS,
+        AV_CODEC_ID_ADPCM_EA_MAXIS_XA,
+        AV_CODEC_ID_ADPCM_IMA_ISS,
+        AV_CODEC_ID_ADPCM_G722,
+        AV_CODEC_ID_ADPCM_IMA_APC,
+        AV_CODEC_ID_ADPCM_VIMA_DEPRECATED,
+
+        AV_CODEC_ID_ADPCM_VIMA = 0x56494d41, # MKBETAG('V','I','M','A')
+        AV_CODEC_ID_VIMA       = 0x56494d41, # MKBETAG('V','I','M','A')
+        AV_CODEC_ID_ADPCM_AFC  = 0x41464320, # MKBETAG('A','F','C',' ')
+        AV_CODEC_ID_ADPCM_IMA_OKI = 0x4f4b4920, # MKBETAG('O','K','I',' ')
+        AV_CODEC_ID_ADPCM_DTK  = 0x44544b20, # MKBETAG('D','T','K',' ')
+        AV_CODEC_ID_ADPCM_IMA_RAD = 0x52414420, # MKBETAG('R','A','D',' ')
+        AV_CODEC_ID_ADPCM_G726LE = 0x36323747, # MKBETAG('6','2','7','G')
     
         # AMR 
-        CODEC_ID_AMR_NB= 0x12000,
-        CODEC_ID_AMR_WB,
+        AV_CODEC_ID_AMR_NB= 0x12000,
+        AV_CODEC_ID_AMR_WB,
      
         # RealAudio codecs
-        CODEC_ID_RA_144= 0x13000,
-        CODEC_ID_RA_288,
+        AV_CODEC_ID_RA_144= 0x13000,
+        AV_CODEC_ID_RA_288,
     
         # various DPCM codecs 
-        CODEC_ID_ROQ_DPCM= 0x14000,
-        CODEC_ID_INTERPLAY_DPCM,
-        CODEC_ID_XAN_DPCM,
-        CODEC_ID_SOL_DPCM,
+        AV_CODEC_ID_ROQ_DPCM= 0x14000,
+        AV_CODEC_ID_INTERPLAY_DPCM,
+        AV_CODEC_ID_XAN_DPCM,
+        AV_CODEC_ID_SOL_DPCM,
     
         # audio codecs 
-        CODEC_ID_MP2= 0x15000,
-        CODEC_ID_MP3, #< preferred ID for decoding MPEG audio layer 1, 2 or 3
-        CODEC_ID_AAC,
-        CODEC_ID_AC3,
-        CODEC_ID_DTS,
-        CODEC_ID_VORBIS,
-        CODEC_ID_DVAUDIO,
-        CODEC_ID_WMAV1,
-        CODEC_ID_WMAV2,
-        CODEC_ID_MACE3,
-        CODEC_ID_MACE6,
-        CODEC_ID_VMDAUDIO,
-        CODEC_ID_SONIC,
-        CODEC_ID_SONIC_LS,
-        CODEC_ID_FLAC,
-        CODEC_ID_MP3ADU,
-        CODEC_ID_MP3ON4,
-        CODEC_ID_SHORTEN,
-        CODEC_ID_ALAC,
-        CODEC_ID_WESTWOOD_SND1,
-        CODEC_ID_GSM, #< as in Berlin toast format
-        CODEC_ID_QDM2,
-        CODEC_ID_COOK,
-        CODEC_ID_TRUESPEECH,
-        CODEC_ID_TTA,
-        CODEC_ID_SMACKAUDIO,
-        CODEC_ID_QCELP,
-        CODEC_ID_WAVPACK,
-        CODEC_ID_DSICINAUDIO,
-        CODEC_ID_IMC,
-        CODEC_ID_MUSEPACK7,
-        CODEC_ID_MLP,
-        CODEC_ID_GSM_MS, # as found in WAV 
-        CODEC_ID_ATRAC3,
-        CODEC_ID_VOXWARE,
-        CODEC_ID_APE,
-        CODEC_ID_NELLYMOSER,
-        CODEC_ID_MUSEPACK8,
-        CODEC_ID_SPEEX,
-        CODEC_ID_WMAVOICE,
-        CODEC_ID_WMAPRO,
-        CODEC_ID_WMALOSSLESS,
-        CODEC_ID_ATRAC3P,
-        CODEC_ID_EAC3,
-        CODEC_ID_SIPR,
-        CODEC_ID_MP1,
-        CODEC_ID_TWINVQ,
-        CODEC_ID_TRUEHD,
-        CODEC_ID_MP4ALS,
-        CODEC_ID_ATRAC1,
-        CODEC_ID_BINKAUDIO_RDFT,
-        CODEC_ID_BINKAUDIO_DCT,
-        CODEC_ID_AAC_LATM,
-        CODEC_ID_QDMC,
+        AV_CODEC_ID_MP2 = 0x15000,
+        AV_CODEC_ID_MP3, #< preferred ID for decoding MPEG audio layer 1, 2 or 3
+        AV_CODEC_ID_AAC,
+        AV_CODEC_ID_AC3,
+        AV_CODEC_ID_DTS,
+        AV_CODEC_ID_VORBIS,
+        AV_CODEC_ID_DVAUDIO,
+        AV_CODEC_ID_WMAV1,
+        AV_CODEC_ID_WMAV2,
+        AV_CODEC_ID_MACE3,
+        AV_CODEC_ID_MACE6,
+        AV_CODEC_ID_VMDAUDIO,
+        AV_CODEC_ID_FLAC,
+        AV_CODEC_ID_MP3ADU,
+        AV_CODEC_ID_MP3ON4,
+        AV_CODEC_ID_SHORTEN,
+        AV_CODEC_ID_ALAC,
+        AV_CODEC_ID_WESTWOOD_SND1,
+        AV_CODEC_ID_GSM, #< as in Berlin toast format
+        AV_CODEC_ID_QDM2,
+        AV_CODEC_ID_COOK,
+        AV_CODEC_ID_TRUESPEECH,
+        AV_CODEC_ID_TTA,
+        AV_CODEC_ID_SMACKAUDIO,
+        AV_CODEC_ID_QCELP,
+        AV_CODEC_ID_WAVPACK,
+        AV_CODEC_ID_DSICINAUDIO,
+        AV_CODEC_ID_IMC,
+        AV_CODEC_ID_MUSEPACK7,
+        AV_CODEC_ID_MLP,
+        AV_CODEC_ID_GSM_MS, # as found in WAV 
+        AV_CODEC_ID_ATRAC3,
+        AV_CODEC_ID_VOXWARE,
+        AV_CODEC_ID_APE,
+        AV_CODEC_ID_NELLYMOSER,
+        AV_CODEC_ID_MUSEPACK8,
+        AV_CODEC_ID_SPEEX,
+        AV_CODEC_ID_WMAVOICE,
+        AV_CODEC_ID_WMAPRO,
+        AV_CODEC_ID_WMALOSSLESS,
+        AV_CODEC_ID_ATRAC3P,
+        AV_CODEC_ID_EAC3,
+        AV_CODEC_ID_SIPR,
+        AV_CODEC_ID_MP1,
+        AV_CODEC_ID_TWINVQ,
+        AV_CODEC_ID_TRUEHD,
+        AV_CODEC_ID_MP4ALS,
+        AV_CODEC_ID_ATRAC1,
+        AV_CODEC_ID_BINKAUDIO_RDFT,
+        AV_CODEC_ID_BINKAUDIO_DCT,
+        AV_CODEC_ID_AAC_LATM,
+        AV_CODEC_ID_QDMC,
+        AV_CODEC_ID_CELT,
+        AV_CODEC_ID_G723_1,
+        AV_CODEC_ID_G729,
+        AV_CODEC_ID_8SVX_EXP,
+        AV_CODEC_ID_8SVX_FIB,
+        AV_CODEC_ID_BMV_AUDIO,
+        AV_CODEC_ID_RALF,
+        AV_CODEC_ID_IAC,
+        AV_CODEC_ID_ILBC,
+        AV_CODEC_ID_OPUS_DEPRECATED,
+        AV_CODEC_ID_COMFORT_NOISE,
+        AV_CODEC_ID_TAK_DEPRECATED,
+        AV_CODEC_ID_METASOUND,
+        AV_CODEC_ID_PAF_AUDIO_DEPRECATED,
+        AV_CODEC_ID_ON2AVC,
+        AV_CODEC_ID_DSS_SP,
+        AV_CODEC_ID_FFWAVESYNTH = 0x46465753, # MKBETAG('F','F','W','S')
+        AV_CODEC_ID_SONIC       = 0x534f4e43, # MKBETAG('S','O','N','C')
+        AV_CODEC_ID_SONIC_LS    = 0x534f4e4c, # MKBETAG('S','O','N','L')
+        AV_CODEC_ID_PAF_AUDIO   = 0x50414641, # MKBETAG('P','A','F','A')
+        AV_CODEC_ID_OPUS        = 0x4f505553, # MKBETAG('O','P','U','S')
+        AV_CODEC_ID_TAK         = 0x7442614b, # MKBETAG('t','B','a','K')
+        AV_CODEC_ID_EVRC        = 0x73657663, # MKBETAG('s','e','v','c')
+        AV_CODEC_ID_SMV         = 0x73736d76, # MKBETAG('s','s','m','v')
+        AV_CODEC_ID_DSD_LSBF    = 0x4453444c, # MKBETAG('D','S','D','L')
+        AV_CODEC_ID_DSD_MSBF    = 0x4453444d, # MKBETAG('D','S','D','M')
+        AV_CODEC_ID_DSD_LSBF_PLANAR = 0x44534431, # MKBETAG('D','S','D','1')
+        AV_CODEC_ID_DSD_MSBF_PLANAR = 0x44534438, # MKBETAG('D','S','D','8')
         
         # subtitle codecs
-        CODEC_ID_DVD_SUBTITLE= 0x17000,
-        CODEC_ID_DVB_SUBTITLE,
-        CODEC_ID_TEXT,  #< raw UTF-8 text
-        CODEC_ID_XSUB,
-        CODEC_ID_SSA,
-        CODEC_ID_MOV_TEXT,
-        CODEC_ID_HDMV_PGS_SUBTITLE,
-        CODEC_ID_DVB_TELETEXT,
-        CODEC_ID_SRT,
-    
-        CODEC_ID_TTF= 0x18000,
-        CODEC_ID_PROBE= 0x19000,
-        CODEC_ID_MPEG2TS= 0x20000
-        CODEC_ID_FFMETADATA=0x21000,   #< Dummy codec for streams containing only metadata information.
+        AV_CODEC_ID_FIRST_SUBTITLE = 0x17000,          #< A dummy ID pointing at the start of subtitle codecs.
+        AV_CODEC_ID_DVD_SUBTITLE = 0x17000,
+        AV_CODEC_ID_DVB_SUBTITLE,
+        AV_CODEC_ID_TEXT,  #< raw UTF-8 text
+        AV_CODEC_ID_XSUB,
+        AV_CODEC_ID_SSA,
+        AV_CODEC_ID_MOV_TEXT,
+        AV_CODEC_ID_HDMV_PGS_SUBTITLE,
+        AV_CODEC_ID_DVB_TELETEXT,
+        AV_CODEC_ID_SRT,
+        AV_CODEC_ID_MICRODVD   = 0x6d445644, # MKBETAG('m','D','V','D')
+        AV_CODEC_ID_EIA_608    = 0x63363038, # MKBETAG('c','6','0','8')
+        AV_CODEC_ID_JACOSUB    = 0x4a535542, # MKBETAG('J','S','U','B')
+        AV_CODEC_ID_SAMI       = 0x53414d49, # MKBETAG('S','A','M','I')
+        AV_CODEC_ID_REALTEXT   = 0x52545854, # MKBETAG('R','T','X','T')
+        AV_CODEC_ID_STL        = 0x5370544c, # MKBETAG('S','p','T','L')
+        AV_CODEC_ID_SUBVIEWER1 = 0x53625631, # MKBETAG('S','b','V','1')
+        AV_CODEC_ID_SUBVIEWER  = 0x53756256, # MKBETAG('S','u','b','V')
+        AV_CODEC_ID_SUBRIP     = 0x53526970, # MKBETAG('S','R','i','p')
+        AV_CODEC_ID_WEBVTT     = 0x57565454, # MKBETAG('W','V','T','T')
+        AV_CODEC_ID_MPL2       = 0x4d504c32, # MKBETAG('M','P','L','2')
+        AV_CODEC_ID_VPLAYER    = 0x56506c72, # MKBETAG('V','P','l','r')
+        AV_CODEC_ID_PJS        = 0x50684a53, # MKBETAG('P','h','J','S')
+        AV_CODEC_ID_ASS        = 0x41535320, # MKBETAG('A','S','S',' ')
+
+        # other specific kind of codecs (generally used for attachments)
+        AV_CODEC_ID_FIRST_UNKNOWN = 0x18000,           #< A dummy ID pointing at the start of various fake codecs.
+        AV_CODEC_ID_TTF = 0x18000,
+        AV_CODEC_ID_BINTEXT    = 0x42545854, # MKBETAG('B','T','X','T')
+        AV_CODEC_ID_XBIN       = 0x5842494e, # MKBETAG('X','B','I','N')
+        AV_CODEC_ID_IDF        = 0x494446, # MKBETAG(0,'I','D','F')
+        AV_CODEC_ID_OTF        = 0x4f5446, # MKBETAG(0,'O','T','F')
+        AV_CODEC_ID_SMPTE_KLV  = 0x4b4c5641, # MKBETAG('K','L','V','A')
+        AV_CODEC_ID_DVD_NAV    = 0x444e4156, # MKBETAG('D','N','A','V')
+        AV_CODEC_ID_TIMED_ID3  = 0x54494433, # MKBETAG('T','I','D','3')
+        AV_CODEC_ID_BIN_DATA   = 0x44415441, # MKBETAG('D','A','T','A')
+
+
+        AV_CODEC_ID_PROBE= 0x19000,
+        AV_CODEC_ID_MPEG2TS= 0x20000,
+        AV_CODEC_ID_MPEG4SYSTEMS= 0x20001,
+        AV_CODEC_ID_FFMETADATA= 0x21000,   #< Dummy codec for streams containing only metadata information.
    
 
-    # ok libavcodec   52.113. 2    
+    # ok libavutil   54. 20.100
+    # PyFFmpeg mapping for AVMediaType from libavutil/avutil.h 
     enum CodecType:
         CODEC_TYPE_UNKNOWN     = AVMEDIA_TYPE_UNKNOWN
         CODEC_TYPE_VIDEO       = AVMEDIA_TYPE_VIDEO
@@ -863,22 +1354,49 @@ cdef extern from "libavcodec/avcodec.h":
         CODEC_TYPE_NB          = AVMEDIA_TYPE_NB
 
 
-    # ok libavcodec   52.113. 2
+    # ok libavcodec   56. 26.100
     struct AVPanScan:
         int id
         int width
         int height
         int16_t position[3][2]
 
+    # ok libavcodec/avcodec.h   56. 26.100
+    enum AVPacketSideDataType:
+        AV_PKT_DATA_PALETTE,
+        AV_PKT_DATA_NEW_EXTRADATA,
+        AV_PKT_DATA_PARAM_CHANGE,
+        AV_PKT_DATA_H263_MB_INFO,
+        AV_PKT_DATA_REPLAYGAIN,
+        AV_PKT_DATA_DISPLAYMATRIX,
+        AV_PKT_DATA_STEREO3D,
+        AV_PKT_DATA_AUDIO_SERVICE_TYPE,
+        AV_PKT_DATA_SKIP_SAMPLES=70,
+        AV_PKT_DATA_JP_DUALMONO,
+        AV_PKT_DATA_STRINGS_METADATA,
+        AV_PKT_DATA_SUBTITLE_POSITION,
+        AV_PKT_DATA_MATROSKA_BLOCKADDITIONAL,
+        AV_PKT_DATA_WEBVTT_IDENTIFIER,
+        AV_PKT_DATA_WEBVTT_SETTINGS,
+        AV_PKT_DATA_METADATA_UPDATE
+
+    # ok libavcodec/avcodec.h   56. 26.100
+    struct AVPacketSideData:
+        uint8_t *data
+        int      size
+        enum AVPacketSideDataType type
   
-  # ok libavcodec   52.113. 2
+    # ok libavcodec/avcodec.h   56. 26.100
     struct AVPacket:
+        AVBufferRef *buf
         int64_t pts            #< presentation time stamp in time_base units
         int64_t dts            #< decompression time stamp in time_base units
         char *data
         int   size
         int   stream_index
         int   flags
+        AVPacketSideData *side_data
+        int side_data_elems
         int   duration         #< presentation duration in time_base units (0 if not available)
         void  *destruct
         void  *priv
@@ -902,39 +1420,42 @@ cdef extern from "libavcodec/avcodec.h":
         #===============================================================================
         int64_t convergence_duration
   
-    # ok libavcodec   52.113. 2
+    # ok libavcodec/avcodec.h   56. 26.100
     struct AVProfile:
         int         profile
         char *      name                    #< short name for the profile
 
 
-    # ok libavcodec   52.113. 2
+    # ok libavcodec/avcodec.h   56. 26.100
     struct AVCodec:
         char *        name
+        char *        long_name
         AVMediaType   type
-        CodecID       id
+        AVCodecID     id
+        int           capabilities    # see CODEC_CAP_*
+        AVRational *supported_framerates; #< array of supported framerates, or NULL if any, array is terminated by {0,0}
+        AVPixelFormat *pix_fmts;     #< array of supported pixel formats, or NULL if unknown, array is terminated by -1
+        int *supported_samplerates;  #< array of supported audio samplerates, or NULL if unknown, array is terminated by 0
+        AVSampleFormat *sample_fmts; #< array of supported sample formats, or NULL if unknown, array is terminated by -1
+        uint64_t *channel_layouts;   #< array of support channel layouts, or NULL if unknown. array is terminated by 0
+#if FF_API_LOWRES
+        uint8_t max_lowres       #< maximum value for lowres supported by the decoder, no direct access, use av_codec_get_max_lowres()
+#endif
+        AVClass *priv_class      #< AVClass for the private context
+        AVProfile *profiles      #< array of recognized profiles, or NULL if unknown, array is terminated by {FF_PROFILE_UNKNOWN}
         int           priv_data_size
-        int  *        init                   # function pointer
-        int  *        encode                 # function pointer
-        int  *        close                  # function pointer
-        int  *        decode                 # function pointer
-        int           capabilities           #< see CODEC_CAP_xxx in 
-        AVCodec *     next
-        void *        flush        
-        AVRational *  supported_framerates   #< array of supported framerates, or NULL 
-                                             #  if any, array is terminated by {0,0}
-        PixelFormat * pix_fmts               #< array of supported pixel formats, or NULL 
-                                             #  if unknown, array is terminanted by -1
-        char *        long_name    
-        int  *        supported_samplerates  #< array of supported audio samplerates, or NULL if unknown, array is terminated by 0
-        AVSampleFormat * sample_fmts         #< array of supported sample formats, or NULL if unknown, array is terminated by -1
-        int64_t *     channel_layouts        #< array of support channel layouts, or NULL if unknown. array is terminated by 0
-        uint8_t       max_lowres             #< maximum value for lowres supported by the decoder
-        void *        priv_class             #< AVClass for the private context
-        AVProfile *   profiles               #< array of recognized profiles, or NULL if unknown, array is terminated by {FF_PROFILE_UNKNOWN}
-        int  *        init_thread_copy       # function pointer
-        int  *        update_thread_context  # function pointer
+        AVCodec     *next;
 
+        int  *        init_thread_copy                   # function pointer
+        int  *        update_thread_context                 # function pointer
+        AVCodecDefault *defaults
+        void *        init_static_data
+        int  *        init
+        int  *        encode_sub
+        int  *        encode2
+        int  *        decode                 # function pointer
+        int  *        close                  # function pointer
+        void *        flush
 
     # ok libavcodec   52.113. 2
     struct AVFrame:
@@ -995,7 +1516,7 @@ cdef extern from "libavcodec/avcodec.h":
         int         width
         int         height
         int         gop_size
-        PixelFormat pix_fmt
+        AVPixelFormat pix_fmt
         int         rate_emu
         void *      draw_horiz_band
         int         sample_rate
@@ -1032,7 +1553,7 @@ cdef extern from "libavcodec/avcodec.h":
         void *      opaque
         char        codec_name[32]
         int         codec_type             #< see AVMEDIA_TYPE_xxx in avcodec.h
-        CodecID     codec_id               #< see CODEC_ID_xxx in avcodec.h
+        AVCodecID   codec_id               #< see CODEC_ID_xxx in avcodec.h
         unsigned int codec_tag
         int         workaround_bugs
         int         luma_elim_threshold
@@ -1094,7 +1615,7 @@ cdef extern from "libavcodec/avcodec.h":
         int         me_pre_cmp
         int         pre_dia_size
         int         me_subpel_quality
-        PixelFormat * get_format
+        AVPixelFormat * get_format
         int         dtg_active_format        #< decoding: DTG active format information 
                                              # (additional aspect ratio  information 
                                              # only used in DVB MPEG-2 transport streams)
@@ -1324,7 +1845,7 @@ cdef extern from "libavcodec/avcodec.h":
         int64_t last_pos                                   #< * Previous frame byte position.
         
 
-    AVCodec *avcodec_find_decoder(CodecID id)
+    AVCodec *avcodec_find_decoder(AVCodecID id)
     
     int avcodec_open(AVCodecContext *avctx, AVCodec *codec)
 
@@ -1348,13 +1869,13 @@ cdef extern from "libavcodec/avcodec.h":
                          AVPacket *avpkt)
 
     int avpicture_fill(AVPicture *picture, uint8_t *ptr,
-                       PixelFormat pix_fmt, int width, int height)
-    int avpicture_layout(AVPicture* src, PixelFormat pix_fmt, 
+                       AVPixelFormat pix_fmt, int width, int height)
+    int avpicture_layout(AVPicture* src, AVPixelFormat pix_fmt, 
                          int width, int height, unsigned char *dest, int dest_size)
 
-    int avpicture_get_size(PixelFormat pix_fmt, int width, int height)
-    void avcodec_get_chroma_sub_sample(PixelFormat pix_fmt, int *h_shift, int *v_shift)
-    char *avcodec_get_pix_fmt_name(PixelFormat pix_fmt)
+    int avpicture_get_size(AVPixelFormat pix_fmt, int width, int height)
+    void avcodec_get_chroma_sub_sample(AVPixelFormat pix_fmt, int *h_shift, int *v_shift)
+    char *avcodec_get_pix_fmt_name(AVPixelFormat pix_fmt)
     void avcodec_set_dimensions(AVCodecContext *s, int width, int height)
 
     AVFrame *avcodec_alloc_frame()
@@ -1496,8 +2017,8 @@ cdef extern from "libavformat/avformat.h":
         char *mime_type
         char *extensions
         int priv_data_size
-        CodecID video_codec
-        CodecID audio_codec
+        AVCodecID video_codec
+        AVCodecID audio_codec
         int *write_header
         int *write_packet
         int *write_trailer
@@ -1508,7 +2029,7 @@ cdef extern from "libavformat/avformat.h":
         int *set_parameters        
         int *interleave_packet
         AVCodecTag **codec_tag
-        CodecID subtitle_codec
+        AVCodecID subtitle_codec
         AVMetadataConv *metadata_conv
         void *priv_class
         AVOutputFormat *next
@@ -1659,9 +2180,9 @@ cdef extern from "libavformat/avformat.h":
         int keylen
         unsigned int nb_programs
         AVProgram **programs
-        CodecID video_codec_id            #< Demuxing: Set by user. Forced video codec_id
-        CodecID audio_codec_id            #< Demuxing: Set by user. Forced audio codec_id
-        CodecID subtitle_codec_id         #< Demuxing: Set by user. Forced subtitle codec_id
+        AVCodecID video_codec_id            #< Demuxing: Set by user. Forced video codec_id
+        AVCodecID audio_codec_id            #< Demuxing: Set by user. Forced audio codec_id
+        AVCodecID subtitle_codec_id         #< Demuxing: Set by user. Forced subtitle codec_id
         #     * Maximum amount of memory in bytes to use for the index of each stream.
         #     * If the index exceeds this size, entries will be discarded as
         #     * needed to maintain a smaller size. This can lead to slower or less
@@ -1703,7 +2224,7 @@ cdef extern from "libavformat/avformat.h":
                                 char *filename,
                                 char *mime_type)
 
-    CodecID av_guess_codec(AVOutputFormat *fmt, char *short_name,
+    AVCodecID av_guess_codec(AVOutputFormat *fmt, char *short_name,
                            char *filename, char *mime_type,
                            AVMediaType type)
 
@@ -2639,7 +3160,7 @@ cdef class VideoTrack(Track):
     """
 
     cdef int outputmode
-    cdef PixelFormat pixel_format
+    cdef AVPixelFormat pixel_format
     cdef int frameno
     cdef int videoframebanksz
     cdef object videoframebank ### we use this to reorder image though time
@@ -3046,7 +3567,7 @@ cdef class VideoTrack(Track):
     ########################################
 
 
-    cdef AVFrame *_convert_to(self,AVPicture *frame, PixelFormat pixformat=PIX_FMT_NONE):
+    cdef AVFrame *_convert_to(self,AVPicture *frame, AVPixelFormat pixformat=PIX_FMT_NONE):
         """ Convert AVFrame to a specified format (Intended for copy) """
 
         cdef AVFrame *pFrame
@@ -3076,7 +3597,7 @@ cdef class VideoTrack(Track):
 
 
 
-    cdef AVFrame *_convert_withbuf(self,AVPicture *frame,char *buf,  PixelFormat pixformat=PIX_FMT_NONE):
+    cdef AVFrame *_convert_withbuf(self,AVPicture *frame,char *buf,  AVPixelFormat pixformat=PIX_FMT_NONE):
         """ Convert AVFrame to a specified format (Intended for copy)  """
 
         cdef AVFrame *pFramePixFormat
