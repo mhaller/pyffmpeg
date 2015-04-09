@@ -267,6 +267,18 @@ cdef extern from "libavutil/dict.h":
     
 ##################################################################################
 # ok libavutil   54. 20.100
+cdef extern from "libavutil/buffer.h":
+    
+    ctypedef struct AVBuffer
+    
+    struct AVBufferRef:
+        AVBuffer *buffer
+        uint8_t *data       #< The data buffer
+        int size            #< Size of data in bytes
+
+
+##################################################################################
+# ok libavutil   54. 20.100
 cdef extern from "libavutil/pixfmt.h":
     enum AVPixelFormat:
         AV_PIX_FMT_NONE = -1,
