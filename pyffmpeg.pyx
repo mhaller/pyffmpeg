@@ -1553,18 +1553,18 @@ cdef extern from "libavcodec/avcodec.h":
         AVMediaType   type
         AVCodecID     id
         int           capabilities    # see CODEC_CAP_*
-        AVRational *supported_framerates; #< array of supported framerates, or NULL if any, array is terminated by {0,0}
-        AVPixelFormat *pix_fmts;     #< array of supported pixel formats, or NULL if unknown, array is terminated by -1
-        int *supported_samplerates;  #< array of supported audio samplerates, or NULL if unknown, array is terminated by 0
-        AVSampleFormat *sample_fmts; #< array of supported sample formats, or NULL if unknown, array is terminated by -1
-        uint64_t *channel_layouts;   #< array of support channel layouts, or NULL if unknown. array is terminated by 0
+        AVRational *supported_framerates #< array of supported framerates, or NULL if any, array is terminated by {0,0}
+        AVPixelFormat *pix_fmts      #< array of supported pixel formats, or NULL if unknown, array is terminated by -1
+        int *supported_samplerates   #< array of supported audio samplerates, or NULL if unknown, array is terminated by 0
+        AVSampleFormat *sample_fmts  #< array of supported sample formats, or NULL if unknown, array is terminated by -1
+        uint64_t *channel_layouts    #< array of support channel layouts, or NULL if unknown. array is terminated by 0
 #if FF_API_LOWRES
         uint8_t max_lowres       #< maximum value for lowres supported by the decoder, no direct access, use av_codec_get_max_lowres()
 #endif
         AVClass *priv_class      #< AVClass for the private context
         AVProfile *profiles      #< array of recognized profiles, or NULL if unknown, array is terminated by {FF_PROFILE_UNKNOWN}
-        int           priv_data_size
-        AVCodec     *next;
+        int priv_data_size
+        AVCodec *next
 
         int  *        init_thread_copy                   # function pointer
         int  *        update_thread_context                 # function pointer
