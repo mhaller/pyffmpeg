@@ -1194,6 +1194,15 @@ cdef extern from "libavcodec/avcodec.h":
         FF_SUB_CHARENC_MODE_PRE_DECODER =  1  #< the AVPacket data needs to be recoded to UTF-8 before being fed to the decoder, requires iconv
 
     # ok libavcodec/avcodec.h   56. 26.100
+    struct AVCodecDescriptor:
+        AVCodecID       id
+        AVMediaType     type
+        const_char      *name           # Name of the codec described by this descriptor, non-empty and unique for each descriptor
+        const_char      *long_name      # A more descriptive name for this codec. May be NULL
+        int             props           # Codec properties, a combination of AV_CODEC_PROP_* flags
+        const_char      **mime_types    # MIME type(s) associated with the codec
+        
+    # ok libavcodec/avcodec.h   56. 26.100
     enum AVDiscard:
         AVDISCARD_NONE   = -16 # discard nothing
         AVDISCARD_DEFAULT=   0 # discard useless packets like 0 size packets in avi
