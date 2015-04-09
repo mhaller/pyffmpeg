@@ -2160,10 +2160,8 @@ cdef extern from "libavcodec/avcodec.h":
     enum:        
         AV_PARSER_PTS_NB = 4        
      
-
     struct AVCodecParser:
         pass
-     
      
     struct AVCodecParserContext:
         void *priv_data
@@ -2244,6 +2242,22 @@ cdef extern from "libavcodec/avcodec.h":
         int64_t cur_frame_pos[AV_PARSER_PTS_NB]            #< Position of the packet in file. Analogous to cur_frame_pts/dts
         int64_t pos                                        #< * Byte position of currently parsed frame in stream.
         int64_t last_pos                                   #< * Previous frame byte position.
+        int duration # Duration of the current frame.
+        #    * For audio, this is in units of 1 / AVCodecContext.sample_rate.
+        #    * For all other types, this is in units of AVCodecContext.time_base.
+        AVFieldOrder field_order
+        AVPictureStructure picture_structure    # Indicate whether a picture is coded as a frame, top field or bottom field
+        int output_picture_number               # Picture number incremented in presentation or output order.
+        
+        # Dimensions of the decoded video intended for presentation.
+        int width
+        int height
+        
+        # Dimensions of the coded video.
+        int coded_width
+        int coded_height
+        
+        int format #  The format of the coded data, corresponds to enum AVPixelFormat for video and for enum AVSampleFormat for audio.
         
 
     AVCodec *avcodec_find_decoder(AVCodecID id)
