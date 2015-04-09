@@ -2154,7 +2154,8 @@ cdef extern from "libavcodec/avcodec.h":
         PARSER_FLAG_COMPLETE_FRAMES          = 0x0001
         PARSER_FLAG_ONCE                     = 0x0002
         PARSER_FLAG_FETCHED_OFFSET           = 0x0004        #< Set if the parser has a valid file offset
-
+        PARSER_FLAG_USE_CODEC_TS             = 0x1000
+        
     # for AVCodecParserContext array lengths
     enum:        
         AV_PARSER_PTS_NB = 4        
