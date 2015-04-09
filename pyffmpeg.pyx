@@ -451,7 +451,7 @@ cdef extern from "libavutil/rational.h":
 cdef extern from "libavformat/avio.h":
     
     struct AVIOContext:
-        const AVClass *av_class
+        AVClass *av_class
         unsigned char *buffer  
         int buffer_size
         unsigned char *buf_ptr
