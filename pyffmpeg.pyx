@@ -540,6 +540,9 @@ cdef extern from "libavformat/avio.h":
 # ok libavutil    54. 20.100
 cdef extern from "libavutil/frame.h":
 
+    enum:
+        AV_NUM_DATA_POINTERS = 8
+
     enum AVFrameSideDataType:
         AV_FRAME_DATA_PANSCAN,              #< The data is the AVPanScan struct defined in libavcodec.
         AV_FRAME_DATA_A53_CC,               #< ATSC A53 Part 4 Closed Captions.
@@ -569,8 +572,8 @@ cdef extern from "libavutil/frame.h":
         AVDictionary *metadata
 
     struct AVFrame:
-        uint8_t *data[8]                     #< pointer to the picture planes
-        int linesize[8]                      #< For video, size in bytes of each picture line.
+        uint8_t *data[AV_NUM_DATA_POINTERS]  #< pointer to the picture planes
+        int linesize[AV_NUM_DATA_POINTERS]   #< For video, size in bytes of each picture line.
         uint8_t **extended_data              #< pointers to the data planes/channels.
         int width                            #< width of the video frame
         int height                           #< height of the video frame
@@ -580,7 +583,7 @@ cdef extern from "libavutil/frame.h":
         AVPictureType pict_type              #< AVPicture type of the frame, see ?_TYPE below
 
         # BEGIN deprecated, will be removed in major 55
-        uint8_t *base                        #< deprecated, will be removed in major 55
+        #uint8_t *base[AV_NUM_DATA_POINTERS]  #< deprecated, will be removed in major 55
         # END deprecated, will be removed in major 55
 
         AVRational sample_aspect_ratio       #< Sample aspect ratio for the video frame
