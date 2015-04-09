@@ -1504,7 +1504,7 @@ cdef extern from "libavcodec/avcodec.h":
     struct AVPacketSideData:
         uint8_t *data
         int      size
-        enum AVPacketSideDataType type
+        AVPacketSideDataType type
   
     # ok libavcodec/avcodec.h   56. 26.100
     struct AVPacket:
