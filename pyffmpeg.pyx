@@ -1791,6 +1791,14 @@ cdef extern from "libavcodec/avcodec.h":
         int (*close)(AVCodecContext *)
         void (*flush)(AVCodecContext *)
         
+    # ok libavcodec/avcodec.h   56. 26.100
+    struct AVHWAccel:
+        const_char          *name       # Name of the hardware accelerated codec
+        AVMediaType         type        # Type of codec implemented by the hardware accelerator, See AVMEDIA_TYPE_xxx
+        AVCodecID           id          # Codec implemented by the hardware accelerator, See AV_CODEC_ID_xxx
+        AVPixelFormat       pix_fmt     # Supported pixel format
+        int                 capabilities # Hardware accelerated codec capabilities, see FF_HWACCEL_CODEC_CAP_*
+        
     struct AVCodecContext:
         void *      av_class
         int         bit_rate
