@@ -81,17 +81,7 @@ cdef enum:
 cdef extern from "string.h":
     memcpy(void * dst, void * src, unsigned long sz)
     memset(void * dst, unsigned char c, unsigned long sz)
-
-
-##################################################################################
-cdef extern from "Python.h":
-    ctypedef int size_t
-    object PyBuffer_FromMemory( void *ptr, int size)
-    object PyBuffer_FromReadWriteMemory( void *ptr, int size)
-    object PyString_FromStringAndSize(char *s, int len)
-    void* PyMem_Malloc( size_t n)
-    void PyMem_Free( void *p)
-
+    
 
 ##################################################################################
 # ok libavutil    54. 20.100
@@ -2429,8 +2419,10 @@ cdef extern from "libswscale/swscale.h":
 
 
 ##################################################################################
+# from Python.h
+##################################################################################
 cdef extern from "Python.h":
-    ctypedef unsigned long size_t
+    ctypedef unsigned long size_t # TODO: or int?
     object PyBuffer_FromMemory( void *ptr, int size)
     object PyBuffer_FromReadWriteMemory( void *ptr, int size)
     object PyString_FromStringAndSize(char *s, int len)
