@@ -536,6 +536,134 @@ cdef extern from "libavformat/avio.h":
     # use avio_alloc_context(buffer, buffer_size, write_flag, opaque,
     #                           read_packet, write_packet, seek);               
     
+##################################################################################
+# ok libavutil    54. 20.100
+cdef extern from "libavutil/frame.h":
+
+    enum AVFrameSideDataType:
+        AV_FRAME_DATA_PANSCAN,              #< The data is the AVPanScan struct defined in libavcodec.
+        AV_FRAME_DATA_A53_CC,               #< ATSC A53 Part 4 Closed Captions.
+        AV_FRAME_DATA_STEREO3D,             #< Stereoscopic 3d metadata.
+        AV_FRAME_DATA_MATRIXENCODING,       #< The data is the AVMatrixEncoding enum defined in libavutil/channel_layout.h.
+        AV_FRAME_DATA_DOWNMIX_INFO,         #< Metadata relevant to a downmix procedure.
+        AV_FRAME_DATA_REPLAYGAIN,           #< ReplayGain information in the form of the AVReplayGain struct.
+        AV_FRAME_DATA_DISPLAYMATRIX,        #< This side data contains a 3x3 transformation matrix describing an affine transformation that needs to be applied to the frame for correct presentation.
+        AV_FRAME_DATA_AFD,                  #< Active Format Description data consisting of a single byte as specified in ETSI TS 101 154 using AVActiveFormatDescription enum
+        AV_FRAME_DATA_MOTION_VECTORS,       #< Motion vectors exported by some codecs (on demand through the export_mvs flag set in the libavcodec AVCodecContext flags2 option). The data is the AVMotionVector struct defined in libavutil/motion_vector.h
+        AV_FRAME_DATA_SKIP_SAMPLES,         #< Recommmends skipping the specified number of samples
+        AV_FRAME_DATA_AUDIO_SERVICE_TYPE    #< his side data must be associated with an audio frame and corresponds to enum AVAudioServiceType defined in avcodec.h.
+
+    enum AVActiveFormatDescription:
+        AV_AFD_SAME         = 8
+        AV_AFD_4_3          = 9
+        AV_AFD_16_9         = 10
+        AV_AFD_14_9         = 11
+        AV_AFD_4_3_SP_14_9  = 13
+        AV_AFD_16_9_SP_14_9 = 14
+        AV_AFD_SP_4_3       = 15
+
+    struct AVFrameSideData:
+        AVFrameSideDataType type
+        uint8_t *data
+        int size
+        AVDictionary *metadata
+
+    struct AVFrame:
+        uint8_t *data[8]                     c#< pointer to the picture planes
+        int linesize[8]                      #< For video, size in bytes of each picture line.
+        uint8_t **extended_data              #< pointers to the data planes/channels.
+        int width, height;                   #< width and height of the video frame
+        int nb_samples;                      #< number of audio samples (per channel) described by this frame
+        int format;                          #< format of the frame, -1 if unknown or unset, Values correspond to enum AVPixelFormat for video frames, enum AVSampleFormat for audio)
+        int key_frame                        #< 1 -> keyframe, 0-> not
+        AVPictureType pict_type              #< AVPicture type of the frame, see ?_TYPE below
+
+        # BEGIN deprecated, will be removed in major 55
+        uint8_t *base                        #< deprecated, will be removed in major 55
+        # END deprecated, will be removed in major 55
+
+        AVRational sample_aspect_ratio       #< Sample aspect ratio for the video frame
+        int64_t pts                          #< presentation timestamp in time_base units (time when frame should be shown to user)
+        int64_t pkt_pts                      #< PTS copied from the AVPacket that was decoded to produce this frame
+        int64_t pkt_dts                      #< DTS copied from the AVPacket that triggered returning this frame
+        int coded_picture_number             #< picture number in bitstream order
+        int display_picture_number           #< picture number in display order
+        int quality                          #< quality (between 1 (good) and FF_LAMBDA_MAX (bad))
+        
+        # BEGIN deprecated, will be removed in major 55
+        int reference                        #< is this picture used as reference
+        int qscale_table                     #< QP table
+        int qstride                          #< QP store stride
+        int qscale_type
+        uint8_t *mbskip_table                #< mbskip_table[mb]>=1 if MB didn't change, stride= mb_width = (width+15)>>4
+        int16_t (*motion_val[2])[2]          #< motion vector table
+        uint32_t *mb_type                    #< macroblock type table: mb_type_base + mb_width + 2
+        short *dct_coeff                     #< DCT coefficients
+        int8_t *ref_index[2]                 #< motion reference frame index
+        # END deprecated, will be removed in major 55
+
+        void *opaque                         #< for some private data of the user
+        uint64_t error[8]                    #< unused for decodig
+
+        # BEGIN deprecated, will be removed in major 55
+        int type                             #< type of the buffer (to keep track of who has to deallocate data[*]
+        # END deprecated, will be removed in major 55
+
+        int repeat_pict                      #<  When decoding, this signals how much the picture must be delayed: extra_delay = repeat_pict / (2*fps)
+        int interlaced_frame                 #< The content of the picture is interlaced
+        int top_field_first                  #< If the content is interlaced, is top field displayed first
+        int palette_has_changed              #< Tell user application that palette has changed from previous frame
+
+        # BEGIN deprecated, will be removed in major 55
+        int buffer_hints                     #< 
+        AVPanScan *pan_scan                  #< Pan scan
+        # END deprecated, will be removed in major 55
+
+        # reordered opaque 64bit (generally an integer or a double precision float
+        # PTS but can be anything). 
+        # The user sets AVCodecContext.reordered_opaque to represent the input at
+        # that time, the decoder reorders values as needed and sets AVFrame.reordered_opaque
+        # to exactly one of the values provided by the user through AVCodecContext.reordered_opaque
+        # @deprecated in favor of pkt_pts        
+        int64_t reordered_opaque
+
+        # BEGIN deprecated, will be removed in major 55
+        void *hwaccel_picture_private        #< hardware accelerator private data
+        AVCodecContext *owner                #< the AVCodecContext which ff_thread_get_buffer() was last called on
+        void *thread_opaque                  #< used by multithreading to store frame-specific info
+        uint8_t motion_subsample_log2        #< log2 of the size of the block which a single vector in motion_val represents: (4->16x16, 3->8x8, 2-> 4x4, 1-> 2x2)
+        # END deprecated, will be removed in major 55
+
+        int sample_rate                      #< Sample rate of the audio data
+        uint64_t channel_layout              #< Channel layout of the audio data
+        AVBufferRef *buf[8]                  #< AVBuffer references backing the data for this frame
+        AVBufferRef **extended_buf           #< For planar audio which requires more than AV_NUM_DATA_POINTERS
+        int nb_extended_buf                  #< Number of elements in extended_buf
+        AVFrameSideData **side_data
+        int nb_side_data
+
+        int flags                            #< Frame flags, a combination of @ref lavu_frame_flags
+
+        AVColorRange color_range             #< MPEG vs JPEG YUV range
+        AVColorPrimaries color_primaries 
+        AVColorTransferCharacteristic color_trc
+        AVChromaLocation chroma_location
+
+        AVColorSpace colorspace              #< YUV colorspace type
+        AVChromaLocation chroma_location
+
+        int64_t best_effort_timestamp        #< frame timestamp estimated using various heuristics
+        int64_t pkt_pos                      #< reordered pos from the last AVPacket that has been input into the decoder
+        int64_t pkt_duration                 #< duration of the corresponding packet, in AVStream->time_base units
+        AVDictionary *metadata
+
+        int decode_error_flags               #< decode error flags of the frame, set to a combination of FF_DECODE_ERROR_xxx flags if the decoder produced a frame, but there were errors during the decoding.
+
+        int channels                         #< number of audio channels, only used for audio
+        int pkt_size                         #< size of the corresponding packet containing the compressed frame
+
+        AVBufferRef *qp_table_buf            #< Not to be accessed directly from outside libavutil
+
     
 ##################################################################################
 # ok libavcodec   56. 26.100
@@ -1449,50 +1577,6 @@ cdef extern from "libavcodec/avcodec.h":
         void *        flush
 
     # ok libavcodec   52.113. 2
-    struct AVFrame:
-        uint8_t *data[4]                        #< pointer to the picture planes
-        int linesize[4]                      #<
-        uint8_t *base[4]                     #< pointer to the first allocated byte of the picture. Can be used in get_buffer/release_buffer
-        int key_frame                        #< 1 -> keyframe, 0-> not
-        int pict_type                        #< Picture type of the frame, see ?_TYPE below
-        int64_t pts                          #< presentation timestamp in time_base units (time when frame should be shown to user)
-        int coded_picture_number             #< picture number in bitstream order
-        int display_picture_number           #< picture number in display order
-        int quality                          #< quality (between 1 (good) and FF_LAMBDA_MAX (bad))
-        int age                              #< buffer age (1->was last buffer and dint change, 2->..., ...)
-        int reference                        #< is this picture used as reference
-        int qscale_table                     #< QP table
-        int qstride                          #< QP store stride
-        uint8_t *mbskip_table                #< mbskip_table[mb]>=1 if MB didn't change, stride= mb_width = (width+15)>>4
-        int16_t (*motion_val[2])[2]          #< motion vector table
-        uint32_t *mb_type                    #< macroblock type table: mb_type_base + mb_width + 2
-        uint8_t motion_subsample_log2        #< log2 of the size of the block which a single vector in motion_val represents: (4->16x16, 3->8x8, 2-> 4x4, 1-> 2x2)
-        void *opaque                         #< for some private data of the user
-        uint64_t error[4]                    #< unused for decodig
-        int type                             #< type of the buffer (to keep track of who has to deallocate data[*]
-        int repeat_pict                      #<  When decoding, this signals how much the picture must be delayed: extra_delay = repeat_pict / (2*fps)
-        int qscale_type
-        int interlaced_frame                 #< The content of the picture is interlaced
-        int top_field_first                  #< If the content is interlaced, is top field displayed first
-        AVPanScan *pan_scan                  #< Pan scan
-        int palette_has_changed              #< Tell user application that palette has changed from previous frame
-        int buffer_hints                     #< 
-        short *dct_coeff                     #< DCT coefficients
-        int8_t *ref_index[2]                 #< motion reference frame index, the order in which these are stored can depend on the codec
-        # reordered opaque 64bit (generally an integer or a double precision float
-        # PTS but can be anything). 
-        # The user sets AVCodecContext.reordered_opaque to represent the input at
-        # that time, the decoder reorders values as needed and sets AVFrame.reordered_opaque
-        # to exactly one of the values provided by the user through AVCodecContext.reordered_opaque
-        # @deprecated in favor of pkt_pts        
-        int64_t reordered_opaque
-        void *hwaccel_picture_private        #< hardware accelerator private data
-        int64_t pkt_pts                      #< reordered pts from the last AVPacket that has been input into the decoder
-        int64_t pkt_dts                      #< dts from the last AVPacket that has been input into the decoder
-#        AVCodecContext *owner                #< the AVCodecContext which ff_thread_get_buffer() was last called on
-        void *thread_opaque                  #< used by multithreading to store frame-specific info
-
-
     # ok libavcodec   52.113. 2
     struct AVCodecContext:
         void *      av_class
