@@ -254,6 +254,15 @@ cdef extern from "libavutil/log.h":
         int (*query_ranges)(AVOptionRanges **, void *obj, const_char *key, int flags)
 
     
+##################################################################################
+# ok libavutil   54. 20.100
+cdef extern from "libavutil/dict.h":
+    
+    struct AVDictionaryEntry:
+        char *key
+        char *value
+
+    ctypedef struct AVDictionary
     
     
 ##################################################################################
