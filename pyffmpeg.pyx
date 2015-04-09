@@ -855,7 +855,7 @@ cdef extern from "libavcodec/avcodec.h":
         AV_FIELD_BT,          #< Bottom coded first, top displayed first
     
     # use an unamed enum for defines
-    cdef enum:
+    enum:
         CODEC_FLAG_QSCALE               = 0x0002  #< Use fixed qscale.
         CODEC_FLAG_4MV                  = 0x0004  #< 4 MV per MB allowed / advanced prediction for H.263.
         CODEC_FLAG_QPEL                 = 0x0010  #< Use qpel MC.
