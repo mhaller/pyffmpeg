@@ -69,6 +69,14 @@ ctypedef unsigned long uint32_t
 ctypedef signed long long int64_t
 ctypedef unsigned long long uint64_t
 
+# other types
+ctypedef char const_char "const char"
+ctypedef AVCodecContext const_AVCodecContext "const AVCodecContext"
+ctypedef struct const_struct_AVSubtitle "const struct AVSubtitle"
+ctypedef AVFrame const_AVFrame "const AVFrame" 
+ctypedef AVClass const_AVClass "const AVClass"
+ctypedef struct const_struct_AVCodec "const struct AVCodec"
+ctypedef AVCodecDescriptor const_AVCodecDescriptor "const AVCodecDescriptor"
 
 ##################################################################################
 cdef enum:
