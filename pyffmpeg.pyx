@@ -105,6 +105,31 @@ cdef extern from "libavutil/rational.h":
         int num                    #< numerator
         int den                    #< denominator
 
+##################################################################################
+# ok libavutil    54. 20.100
+cdef extern from "libavutil/version.h":
+
+    DEF LIBAVUTIL_VERSION_MAJOR = 54
+    DEF LIBAVUTIL_VERSION_MINOR = 20
+    DEF LIBAVUTIL_VERSION_MICRO = 100
+
+    enum:
+        FF_API_OLD_AVOPTIONS           = (LIBAVUTIL_VERSION_MAJOR < 55)
+        FF_API_PIX_FMT                 = (LIBAVUTIL_VERSION_MAJOR < 55)
+        FF_API_CONTEXT_SIZE            = (LIBAVUTIL_VERSION_MAJOR < 55)
+        FF_API_PIX_FMT_DESC            = (LIBAVUTIL_VERSION_MAJOR < 55)
+        FF_API_AV_REVERSE              = (LIBAVUTIL_VERSION_MAJOR < 55)
+        FF_API_AUDIOCONVERT            = (LIBAVUTIL_VERSION_MAJOR < 55)
+        FF_API_CPU_FLAG_MMX2           = (LIBAVUTIL_VERSION_MAJOR < 55)
+        FF_API_LLS_PRIVATE             = (LIBAVUTIL_VERSION_MAJOR < 55)
+        FF_API_AVFRAME_LAVC            = (LIBAVUTIL_VERSION_MAJOR < 55)
+        FF_API_VDPAU                   = (LIBAVUTIL_VERSION_MAJOR < 55)
+        FF_API_GET_CHANNEL_LAYOUT_COMPAT= (LIBAVUTIL_VERSION_MAJOR < 55)
+        FF_API_XVMC                    = (LIBAVUTIL_VERSION_MAJOR < 55)
+        FF_API_OPT_TYPE_METADATA       = (LIBAVUTIL_VERSION_MAJOR < 55)
+
+
+##################################################################################
     
     
 ##################################################################################
