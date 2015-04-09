@@ -31,7 +31,7 @@ if sys.platform in [ 'win32', 'win64' ] :
     
 else:
     ffmpegpath = '/opt/codecs'
-    for x in [ os.environ["HOME"]+"build/ffmpeg",  '/usr/local/ffmpeg',  '/opt/codecs',   '/opt/ffmpeg']:
+    for x in [ os.environ["HOME"]+'build/ffmpeg', '/opt/local', '/usr/local/ffmpeg', '/opt/codecs', '/opt/ffmpeg']:
         try:
              os.stat(x)
              ffmpegpath = x
