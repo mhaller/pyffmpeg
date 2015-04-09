@@ -1212,6 +1212,19 @@ cdef extern from "libavcodec/avcodec.h":
         AVDISCARD_NONKEY =  32 # discard all frames except keyframes
         AVDISCARD_ALL    =  48 # discard all
 
+    # ok libavcodec/avcodec.h   56. 26.100
+    enum AVAudioServiceType:
+        AV_AUDIO_SERVICE_TYPE_MAIN              = 0
+        AV_AUDIO_SERVICE_TYPE_EFFECTS           = 1
+        AV_AUDIO_SERVICE_TYPE_VISUALLY_IMPAIRED = 2
+        AV_AUDIO_SERVICE_TYPE_HEARING_IMPAIRED  = 3
+        AV_AUDIO_SERVICE_TYPE_DIALOGUE          = 4
+        AV_AUDIO_SERVICE_TYPE_COMMENTARY        = 5
+        AV_AUDIO_SERVICE_TYPE_EMERGENCY         = 6
+        AV_AUDIO_SERVICE_TYPE_VOICE_OVER        = 7
+        AV_AUDIO_SERVICE_TYPE_KARAOKE           = 8
+        AV_AUDIO_SERVICE_TYPE_NB
+
     # ok libavcodec   56. 26.100
     enum AVCodecID:
         AV_CODEC_ID_NONE,
