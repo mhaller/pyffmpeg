@@ -2570,10 +2570,6 @@ cdef av_read_frame_flush(AVFormatContext *s):
             st.cur_dts = 0
 
 # originally defined in mpegvideo.h
-def IS_INTRA4x4(mb_type):
-    return ((mb_type & MB_TYPE_INTRA4x4)>0)*1
-def IS_INTRA16x16(mb_type):
-    return ((mb_type & MB_TYPE_INTRA16x16)>0)*1
 def IS_INTRA4x4(a):
     return (((a)&MB_TYPE_INTRA4x4)>0)*1
 def IS_INTRA16x16(a):
