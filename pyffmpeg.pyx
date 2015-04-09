@@ -130,6 +130,86 @@ cdef extern from "libavutil/version.h":
 
 
 ##################################################################################
+# ok libavutil    54. 20.100
+cdef extern from "libavutil/opt.h":
+
+    enum:
+        AV_OPT_FLAG_ENCODING_PARAM = 1   #< a generic parameter which can be set by the user for muxing or encoding
+        AV_OPT_FLAG_DECODING_PARAM = 2   #< a generic parameter which can be set by the user for demuxing or decoding
+
+        # deprecated, will be removed in master 55
+        # IF FF_API_OPT_TYPE_METADATA == 1:
+        AV_OPT_FLAG_METADATA       = 4   #< some data extracted or inserted into the file like title, comment, ...
+
+        AV_OPT_FLAG_AUDIO_PARAM    = 8
+        AV_OPT_FLAG_VIDEO_PARAM    = 16
+        AV_OPT_FLAG_SUBTITLE_PARAM = 32
+        AV_OPT_FLAG_EXPORT         = 64  #< The option is inteded for exporting values to the caller.
+        AV_OPT_FLAG_READONLY       = 128
+        AV_OPT_FLAG_FILTERING_PARAM = (1<<16) #< a generic parameter which can be set by the user for filtering
+
+    enum AVOptionType:
+        AV_OPT_TYPE_FLAGS,
+        AV_OPT_TYPE_INT,
+        AV_OPT_TYPE_INT64,
+        AV_OPT_TYPE_DOUBLE,
+        AV_OPT_TYPE_FLOAT,
+        AV_OPT_TYPE_STRING,
+        AV_OPT_TYPE_RATIONAL,
+        AV_OPT_TYPE_BINARY,  #< offset must point to a pointer immediately followed by an int for the length
+        AV_OPT_TYPE_DICT,
+        AV_OPT_TYPE_CONST = 128,
+        AV_OPT_TYPE_IMAGE_SIZE = 0x53495a45, # MKBETAG('S','I','Z','E')
+        AV_OPT_TYPE_PIXEL_FMT  = 0x50464d54, # MKBETAG('P','F','M','T')
+        AV_OPT_TYPE_SAMPLE_FMT = 0x53464d54, # MKBETAG('S','F','M','T')
+        AV_OPT_TYPE_VIDEO_RATE = 0x56524154, # MKBETAG('V','R','A','T')
+        AV_OPT_TYPE_DURATION   = 0x44555220, # MKBETAG('D','U','R',' ')
+        AV_OPT_TYPE_COLOR      = 0x434f4c52, # MKBETAG('C','O','L','R')
+        AV_OPT_TYPE_CHANNEL_LAYOUT = 0x43484c41, # MKBETAG('C','H','L','A')
+        # BEGIN deprecated, will be removed in major 55
+        FF_OPT_TYPE_FLAGS = 0,
+        FF_OPT_TYPE_INT,
+        FF_OPT_TYPE_INT64,
+        FF_OPT_TYPE_DOUBLE,
+        FF_OPT_TYPE_FLOAT,
+        FF_OPT_TYPE_STRING,
+        FF_OPT_TYPE_RATIONAL,
+        FF_OPT_TYPE_BINARY,  #< offset must point to a pointer immediately followed by an int for the length
+        FF_OPT_TYPE_CONST=128
+        # END deprecated, will be removed in major 55
+
+    union AVOptionDefaultValUnion:
+        int64_t i64
+        double dbl
+        const_char *str
+        AVRational q
+
+    struct AVOption:
+        const_char *name
+        const_char *help    #< short English help text
+        int offset
+        AVOptionType type
+        
+        AVOptionDefaultValUnion default_val
+        
+        double min          #< minimum valid value for the option
+        double max          #< maximum valid value for the option
+        int flags
+        const_char *unit    #< The logical unit to which the option belongs
+    
+    struct AVOptionRange:
+        const_char *str
+        double value_min 
+        double value_max
+        double component_min
+        double component_max
+        int is_range
+        
+    struct AVOptionRanges:
+        AVOptionRange **range   #< Array of option ranges
+        int nb_ranges           #< Number of ranges per component
+        int nb_components       #< Number of componentes
+    
     
     
 ##################################################################################
