@@ -1640,9 +1640,7 @@ cdef extern from "libavcodec/avcodec.h":
         void *      release_buffer
         int         has_b_frames           #< Size of the frame reordering buffer in the decoder: e.g. For MPEG-2 it is 1 IPB or 0 low delay IP 
         int         block_align
-        int         parse_only             #< decoding only: If true, only parsing is done
-                                           #(function avcodec_parse_frame()). The frame
-                                           # data is returned. Only MPEG codecs support this now.
+        int         parse_only             #< decoding only: If true, only parsing is done (function avcodec_parse_frame()). The frame  data is returned. Only MPEG codecs support this now.
         int         mpeg_quant
         char *      stats_out
         char *      stats_in
@@ -1691,10 +1689,7 @@ cdef extern from "libavcodec/avcodec.h":
         int         pre_dia_size
         int         me_subpel_quality
         AVPixelFormat * get_format
-        int         dtg_active_format        #< decoding: DTG active format information 
-                                             # (additional aspect ratio  information 
-                                             # only used in DVB MPEG-2 transport streams)
-                                             # 0  if not set. See FF_DTG_AFD_xxx in avcodec.h
+        int         dtg_active_format        #< decoding: DTG active format information (additional aspect ratio  information  only used in DVB MPEG-2 transport streams)  0  if not set. See FF_DTG_AFD_xxx in avcodec.h
         int         me_range
         int         intra_quant_bias
         int         inter_quant_bias
@@ -1733,8 +1728,7 @@ cdef extern from "libavcodec/avcodec.h":
         int         skip_bottom
         int         profile                    #< profile, see FF_PROFILE_xxx in avcodec.h
         int         level                      #< level, see FF_LEVEL_xxx in avcodec.h
-        int         lowres                     #< decoding: low resolution decoding,
-                                               # 1-> 1/2 size, 2->1/4 size
+        int         lowres                     #< decoding: low resolution decoding, 1-> 1/2 size, 2->1/4 size
         int         coded_width
         int         coded_height
         int         frame_skip_threshold
@@ -3126,7 +3120,7 @@ cdef class AudioTrack(Track):
         self.rdata_size=self.data_size
         lf=2
         audio_size=self.rdata_size*lf
-	
+
         first=1
         #DEBUG( "process packet size=%s pts=%s dts=%s "%(str(pkt.size),str(pkt.pts),str(pkt.dts)))
         #while or if? (see version 2.0)
@@ -3435,7 +3429,7 @@ cdef class VideoTrack(Track):
         for xydirection in range(2):
             for x in range(mb_width):
                 for y in range(mb_height):
-                     res[y,x]=f.ref_index[preddirection][x + y*mb_stride]
+                    res[y,x]=f.ref_index[preddirection][x + y*mb_stride]
         return res
         
         
@@ -4397,8 +4391,8 @@ cdef class FFMpegReader(AFFMpegReader):
 
 
 #cdef class FFMpegStreamReader(FFMpegReader):
-   # """
-   # This contains some experimental code not meant to be used for the moment
+    # """
+    # This contains some experimental code not meant to be used for the moment
     #"""
 #    def open_url(self,  char *filename,track_selector=None):
 #        cdef AVInputFormat *format
