@@ -218,6 +218,42 @@ cdef extern from "libavutil/opt.h":
         int nb_ranges           #< Number of ranges per component
         int nb_components       #< Number of componentes
     
+##################################################################################
+# ok libavutil    54. 20.100
+cdef extern from "libavutil/log.h":
+    enum AVClassCategory:
+        AV_CLASS_CATEGORY_NA = 0,
+        AV_CLASS_CATEGORY_INPUT,
+        AV_CLASS_CATEGORY_OUTPUT,
+        AV_CLASS_CATEGORY_MUXER,
+        AV_CLASS_CATEGORY_DEMUXER,
+        AV_CLASS_CATEGORY_ENCODER,
+        AV_CLASS_CATEGORY_DECODER,
+        AV_CLASS_CATEGORY_FILTER,
+        AV_CLASS_CATEGORY_BITSTREAM_FILTER,
+        AV_CLASS_CATEGORY_SWSCALER,
+        AV_CLASS_CATEGORY_SWRESAMPLER,
+        AV_CLASS_CATEGORY_DEVICE_VIDEO_OUTPUT = 40,
+        AV_CLASS_CATEGORY_DEVICE_VIDEO_INPUT,
+        AV_CLASS_CATEGORY_DEVICE_AUDIO_OUTPUT,
+        AV_CLASS_CATEGORY_DEVICE_AUDIO_INPUT,
+        AV_CLASS_CATEGORY_DEVICE_OUTPUT,
+        AV_CLASS_CATEGORY_DEVICE_INPUT,
+        AV_CLASS_CATEGORY_NB
+
+    struct AVClass:
+        char* class_name
+        char* (*item_name)(void* ctx)
+        AVOption *option
+        int version
+        int log_level_offset_offset
+        int parent_log_context_offset
+        AVClass* (*child_class_next)(AVClass *prev)
+        AVClassCategory category
+        AVClassCategory (*get_category)(void* ctx)
+        int (*query_ranges)(AVOptionRanges **, void *obj, const_char *key, int flags)
+
+    
     
     
 ##################################################################################
