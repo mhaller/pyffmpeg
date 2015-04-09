@@ -778,7 +778,7 @@ cdef extern from "libavutil/frame.h":
         # END deprecated, will be removed in major 55
 
         void *opaque                         #< for some private data of the user
-        uint64_t error[8]                    #< unused for decodig
+        uint64_t error[AV_NUM_DATA_POINTERS] #< unused for decodig
 
         # BEGIN deprecated, will be removed in major 55
         int type                             #< type of the buffer (to keep track of who has to deallocate data[*]
@@ -811,7 +811,7 @@ cdef extern from "libavutil/frame.h":
 
         int sample_rate                      #< Sample rate of the audio data
         uint64_t channel_layout              #< Channel layout of the audio data
-        AVBufferRef *buf[8]                  #< AVBuffer references backing the data for this frame
+        AVBufferRef *buf[AV_NUM_DATA_POINTERS] #< AVBuffer references backing the data for this frame
         AVBufferRef **extended_buf           #< For planar audio which requires more than AV_NUM_DATA_POINTERS
         int nb_extended_buf                  #< Number of elements in extended_buf
         AVFrameSideData **side_data
@@ -822,7 +822,6 @@ cdef extern from "libavutil/frame.h":
         AVColorRange color_range             #< MPEG vs JPEG YUV range
         AVColorPrimaries color_primaries 
         AVColorTransferCharacteristic color_trc
-        AVChromaLocation chroma_location
 
         AVColorSpace colorspace              #< YUV colorspace type
         AVChromaLocation chroma_location
