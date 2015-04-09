@@ -1780,19 +1780,17 @@ cdef extern from "libavcodec/avcodec.h":
         int priv_data_size
         AVCodec *next
 
-        int  *        init_thread_copy                   # function pointer
-        int  *        update_thread_context                 # function pointer
+        int (*init_thread_copy)(AVCodecContext *)
+        int (*update_thread_context)(AVCodecContext *dst, const_AVCodecContext *src)
         AVCodecDefault *defaults
-        void *        init_static_data
-        int  *        init
-        int  *        encode_sub
-        int  *        encode2
-        int  *        decode                 # function pointer
-        int  *        close                  # function pointer
-        void *        flush
-
-    # ok libavcodec   52.113. 2
-    # ok libavcodec   52.113. 2
+        void (*init_static_data)(AVCodec *codec)
+        int (*init)(AVCodecContext *)
+        int (*encode_sub)(AVCodecContext *, uint8_t *buf, int buf_size, const_struct_AVSubtitle *sub)
+        int (*encode2)(AVCodecContext *avctx, AVPacket *avpkt, const_AVFrame *frame, int *got_packet_ptr)
+        int (*decode)(AVCodecContext *, void *outdata, int *outdata_size, AVPacket *avpkt)
+        int (*close)(AVCodecContext *)
+        void (*flush)(AVCodecContext *)
+        
     struct AVCodecContext:
         void *      av_class
         int         bit_rate
