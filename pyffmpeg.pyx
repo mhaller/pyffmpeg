@@ -1799,245 +1799,355 @@ cdef extern from "libavcodec/avcodec.h":
         AVPixelFormat       pix_fmt     # Supported pixel format
         int                 capabilities # Hardware accelerated codec capabilities, see FF_HWACCEL_CODEC_CAP_*
         
+    # ok libavcodec/avcodec.h   56. 26.100
+    # main external API structure
+    # Please use AVOptions (av_opt* / av_set/get*()) to access these fields from user applications
+    # sizeof(AVCodecContext) must not be used outside libav*.
     struct AVCodecContext:
-        void *      av_class
-        int         bit_rate
-        int         bit_rate_tolerance
-        int         flags
-        int         sub_id
-        int         me_method
-        uint8_t *   extradata
-        int         extradata_size
-        AVRational  time_base
-        int         width
-        int         height
-        int         gop_size
-        AVPixelFormat pix_fmt
-        int         rate_emu
-        void *      draw_horiz_band
-        int         sample_rate
-        int         channels
-        int         sample_fmt
-        int         frame_size
-        int         frame_number
-        int         real_pict_num          #< only for LIBAVCODEC_VERSION_MAJOR < 53
-        int         delay
-        float       qcompress
-        float       qblur
-        int         qmin
-        int         qmax
-        int         max_qdiff
-        int         max_b_frames
-        float       b_quant_factor
-        int         rc_strategy            #< will be removed in later libav versions
-        int         b_frame_strategy
-        int         hurry_up               #< hurry up amount: decoding: Set by user. 1-> Skip B-frames, 2-> Skip IDCT/dequant too, 5-> Skip everything except header
-        AVCodec *   codec
-        void *      priv_data
-        int         rtp_payload_size
-        void *      rtp_callback
-        # statistics, used for 2-pass encoding
-        int         mv_bits
-        int         header_bits
-        int         i_tex_bits
-        int         p_tex_bits
-        int         i_count
-        int         p_count
-        int         skip_count
-        int         misc_bits
-        int         frame_bits
-        void *      opaque
-        char        codec_name[32]
-        int         codec_type             #< see AVMEDIA_TYPE_xxx in avcodec.h
-        AVCodecID   codec_id               #< see CODEC_ID_xxx in avcodec.h
-        unsigned int codec_tag
-        int         workaround_bugs
-        int         luma_elim_threshold
-        int         chroma_elim_threshold
-        int         strict_std_compliance  #< see FF_COMPLIANCE_xxx in avcodec.h
-        float       b_quant_offset
-        int         error_recognition      #< see FF_ER_xxx in avcodec.h
-        int  *      get_buffer
-        void *      release_buffer
-        int         has_b_frames           #< Size of the frame reordering buffer in the decoder: e.g. For MPEG-2 it is 1 IPB or 0 low delay IP 
-        int         block_align
-        int         parse_only             #< decoding only: If true, only parsing is done (function avcodec_parse_frame()). The frame  data is returned. Only MPEG codecs support this now.
-        int         mpeg_quant
-        char *      stats_out
-        char *      stats_in
-        float       rc_qsquish
-        float       rc_qmod_amp
-        int         rc_qmod_freq
-        void *      rc_override
-        int         rc_override_count
-        char *      rc_eq
-        int         rc_max_rate
-        int         rc_min_rate
-        int         rc_buffer_size
-        float       rc_buffer_aggressivity
-        float       i_quant_factor
-        float       i_quant_offset
-        float       rc_initial_cplx
-        int         dct_algo                #< only coding: DCT algorithm see FF_DCT_xxx in avcodec.h
-        float       lumi_masking
-        float       temporal_cplx_masking
-        float       spatial_cplx_masking
-        float       p_masking
-        float       dark_masking
-        int         idct_algo               #< IDCT algorithm: see  FF_IDCT_xxx in avcodec.h
-        int         slice_count
-        int *       slice_offset
-        int         error_concealment       #< only decoding: see FF_EC_xxx in avcodec.h
-        unsigned    dsp_mask           #< dsp_mask could be add used to disable unwanted CPU features (i.e. MMX, SSE. ...)
-                                        # see FF_MM_xxx in avcodec.h
-        int         bits_per_coded_sample
-        int         prediction_method       #< only encoding
-        AVRational  sample_aspect_ratio
-        AVFrame *   coded_frame       #< the picture in the bitstream
-        int         debug                   #< encoding/decoding: see FF_DEBUG_xxx in avcodec.h
-        int         debug_mv
-        uint64_t    error[4]
-        int         mb_qmin
-        int         mb_qmax
-        int         me_cmp
-        int         me_sub_cmp
-        int         mb_cmp
-        int         ildct_cmp
-        int         dia_size
-        int         last_predictor_count
-        int         pre_me
-        int         me_pre_cmp
-        int         pre_dia_size
-        int         me_subpel_quality
-        AVPixelFormat * get_format
-        int         dtg_active_format        #< decoding: DTG active format information (additional aspect ratio  information  only used in DVB MPEG-2 transport streams)  0  if not set. See FF_DTG_AFD_xxx in avcodec.h
-        int         me_range
-        int         intra_quant_bias
-        int         inter_quant_bias
-        int         color_table_id
-        int         internal_buffer_count
-        void *      internal_buffer
-        int         global_quality
-        int         coder_type
-        int         context_model
-        int         slice_flags                #< see SLICE_FLAG_xxx in avcodec.h
-        int         xvmc_acceleration
-        int         mb_decision
-        uint16_t *  intra_matrix
-        uint16_t *  inter_matrix
-        unsigned int stream_codec_tag          #< decoding: fourcc from the AVI stream header (LSB first, so "ABCD" -> ('D'<<24) + ('C'<<16) + ('B'<<8) + 'A')
-        int         scenechange_threshold      #< encoding
-        int         lmin
-        int         lmax
-        void *      palctrl             #< LIBAVCODEC_VERSION_MAJOR < 54
-        int         noise_reduction
-        int  *      reget_buffer
-        int         rc_initial_buffer_occupancy
-        int         inter_threshold
-        int         flags2                     #< see CODEC_FLAG2_xxx in avcodec.h
-        int         error_rate                 #< EV
-        int         antialias_algo             #< DA MP3 antialias algorithm, see FF_AA_* below
-        int         quantizer_noise_shaping    #< E
-        int         thread_count               #< E/D set the number of threads
-        int  *      execute        
-        void *      thread_opaque
-        int         me_threshold
-        int         mb_threshold
-        int         intra_dc_precision
-        int         nsse_weight
-        int         skip_top
-        int         skip_bottom
-        int         profile                    #< profile, see FF_PROFILE_xxx in avcodec.h
-        int         level                      #< level, see FF_LEVEL_xxx in avcodec.h
-        int         lowres                     #< decoding: low resolution decoding, 1-> 1/2 size, 2->1/4 size
-        int         coded_width
-        int         coded_height
-        int         frame_skip_threshold
-        int         frame_skip_factor
-        int         frame_skip_exp
-        int         frame_skip_cmp
-        float       border_masking
-        int         mb_lmin
-        int         mb_lmax
-        int         me_penalty_compensation
-        AVDiscard   skip_loop_filter        #< VD
-        AVDiscard   skip_idct               #< VD
-        AVDiscard   skip_frame              #< VD
-        int         bidir_refine            #< VE 
-        int         brd_scale               #< VE 
-        float       crf                     #< VE
-        int         cqp                     #< VE
-        int         keyint_min              #< VE: minimum GOP size
-        int         refs                    #< VE: number of reference frames
-        int         chromaoffset            #< VE: chroma qp offset from luma
-        int         bframebias              #< VE: Influences how often B-frames are used
-        int         trellis                 #< VE: trellis RD quantization
-        float       complexityblur          #< VE: Reduce fluctuations in qp (before curve compression)
-        int         deblockalpha            #< VE: in-loop deblocking filter alphac0 parameter (range: -6..6)
-        int         deblockbeta             #< VE: in-loop deblocking filter beta parameter (range: -6..6)
-        int         partitions              #< VE: macroblock subpartition sizes to consider 
-                                            #      - p8x8, p4x4, b8x8, i8x8, i4x4, see X264_PART_xxx in avcodec.h
-        int         directpred              #< VE: direct MV prediction mode - 0 (none), 1 (spatial), 2 (temporal), 3 (auto)
-        int         cutoff                  #< AE: Audio cutoff bandwidth (0 means "automatic")
-        int         scenechange_factor      #< VE: Multiplied by qscale for each frame and added to scene_change_score
-        int         mv0_threshold           #< VE: Note: Value depends upon the compare function used for fullpel ME 
-        int         b_sensitivity           #< VE: Adjusts sensitivity of b_frame_strategy 1 
-        int         compression_level       #< VE
-        int         use_lpc                 #< AE
-        int         lpc_coeff_precision     #< AE
-        int         min_prediction_order    #< AE
-        int         max_prediction_order    #< AE
-        int         prediction_order_method 
-        int         min_partition_order
-        int         max_partition_order
-        int64_t     timecode_frame_start    #< VE: GOP timecode frame start number, in non drop frame format 
-        int         request_channels        #< Decoder should decode to this many channels if it can (0 for default)
-                                            # LIBAVCODEC_VERSION_MAJOR < 53
-        float       drc_scale               #< AD: Percentage of dynamic range compression to be applied by the decoder
-                                            # The default value is 1.0, corresponding to full compression.
-        int64_t     reordered_opaque        #<  @deprecated in favor of pkt_pts, opaque 64bit number (generally a PTS) 
-                                            # that will be reordered and output in 
-                                            # AVFrame.reordered_opaque
-        int         bits_per_raw_sample     #< VE/VD: Bits per sample/pixel of internal libavcodec pixel/sample format
-        int64_t     channel_layout          #< AE/AD: Audio channel layout
-        int64_t     request_channel_layout  #< AD: Request decoder to use this channel layout if it can (0 for default)
-        float       rc_max_available_vbv_use #< Ratecontrol attempt to use, at maximum, <value> of what can be used without an underflow        
-        float       rc_min_vbv_overflow_use #< Ratecontrol attempt to use, at least, <value> times the amount needed to prevent a vbv overflow
-        void *      hwaccel                 #< Hardware accelerator in use
-        int         ticks_per_frame         #< VD/VE: Set to time_base ticks per frame. Default 1, e.g., H.264/MPEG-2 set it to 2.
-        void *      hwaccel_context         #< Hardware accelerator context
-        AVColorPrimaries color_primaries    #< VE/VD: Chromaticity coordinates of the source primaries
-        AVColorTransferCharacteristic color_trc #< VE/VD: Color Transfer Characteristic 
-        AVColorSpace colorspace             #< VE/VD: YUV colorspace type
-        AVColorRange color_range            #< VE/VD:  MPEG vs JPEG YUV range
-        AVChromaLocation chroma_sample_location #< VE/VD: This defines the location of chroma samples
-        int  *      execute2    
-        int         weighted_p_pred         #< VE: explicit P-frame weighted prediction analysis method
-        int         aq_mode
-        float       aq_strength
-        float       psy_rd                  #< VE
-        float       psy_trellis             #< VE
-        int         rc_lookahead             #< VE
-        float       crf_max             #< VE
-        int         log_level_offset
-        int         lpc_type
-        int         lpc_passes
-        int         slices                        #< Number of slices
-        uint8_t *   subtitle_header
-        int         subtitle_header_size
-        AVPacket *  pkt                     #< VD: Current packet as passed into the decoder
-        int         is_copy                 #< VE/VD: Whether this is a copy of the context which had init() called on it, This is used by multithreading - shared tables and picture pointers should be freed from the original context only.
-        int         thread_type             #< VES/VDS: Which multithreading methods to use: frame 1, slice 2
-        int         active_thread_type      #< VEG/VDG: Which multithreading methods are in use by the codec
-        int         thread_safe_callbacks   #< VES/VDS:  Set by the client if its custom get_buffer() callback can be called
-        uint64_t    vbv_delay               #< VEG: VBV delay coded in the last frame (in periods of a 27 MHz clock)
-    
-    
-    # ok libavcodec   52.113. 2  
-    struct AVPicture:
-        uint8_t *data[4]
-        int linesize[4]
+        const_AVClass *av_class
+        int                     log_level_offset
+        AVMediaType             codec_type  # see AVMEDIA_TYPE_xxx
+        const_struct_AVCodec    *codec
+        
+        # deprecated, will be removed in major 57
+        char                    codec_name[32]
+        
+        AVCodecID               codec_id    # see AV_CODEC_ID_xxx
+        unsigned int            codec_tag   # fourcc
+        
+        # deprecated, will be removed in major 59
+        unsigned int stream_codec_tag
+        
+        void                    *priv_data
+        AVCodecInternal         *internal   # Private context used for internal data
+        
+        void                    *opaque     # Private data of the user, can be used to carry app specific stuff
 
+        int                     bit_rate    # the average bitrate
+        int                     bit_rate_tolerance # number of bits the bitstream is allowed to diverge from the reference
+        
+        int                     global_quality  # Global quality for codecs which cannot change it per frame
+        int                     compression_level
+        
+        int                     flags       # CODEC_FLAG_*
+        int                     flags2      # CODEC_FLAG2_*
+
+        uint8_t                 *extradata  # some codecs need / can use extradata like Huffman tables
+        int                     extradata_size
+        
+        AVRational              time_base   # fundamental unit of time (in seconds)
+        int                     ticks_per_frame # For some codecs, the time base is closer to the field rate than the frame rate
+
+        int                     delay       # Codec delay
+        
+        int                     width       # video only: picture width
+        int                     height      # video only: picture height
+        
+        int                     coded_width # Bitstream width 
+        int                     coded_height # Bitstream height 
+        
+        int                     gop_size    # the number of pictures in a group of pictures, or 0 for intra_only
+        
+        AVPixelFormat           pix_fmt     # Pixel format, see AV_PIX_FMT_xxx.
+
+        # 1 (zero), 2 (full), 3 (log), 4 (phods), 5 (epzs), 6 (x1), 7 (hex),
+        # 8 (umh), 9 (iter), 10 (tesa) [7, 8, 10 are x264 specific, 9 is snow specific]
+        int                     me_method   # Motion estimation algorithm used for video coding           
+
+        void (*draw_horiz_band)(AVCodecContext *s, const_AVFrame *src, int offset[AV_NUM_DATA_POINTERS], int y, int type, int height)
+
+        # callback to negotiate the pixelFormat
+        AVPixelFormat (*get_format)(AVCodecContext *s, AVPixelFormat * fmt)
+
+        int                     max_b_frames    # maximum number of B-frames between non-B-frames
+        float                   b_quant_factor  # qscale factor between IP and B-frames
+        int                     rc_strategy
+        int                     b_frame_strategy
+        float                   b_quant_offset  # qscale offset between IP and B-frames
+        int                     has_b_frames    # Size of the frame reordering buffer in the decoder
+        int                     mpeg_quant      # 0-> h263 quant 1-> mpeg quant
+        float                   i_quant_factor  # qscale factor between P and I-frames
+        float                   i_quant_offset  # qscale offset between P and I-frames
+        float                   lumi_masking    # luminance masking (0-> disabled)
+        float                   temporal_cplx_masking # temporary complexity masking (0-> disabled)
+        float                   spatial_cplx_masking # spatial complexity masking (0-> disabled)
+        float                   p_masking       # p block masking (0-> disabled)
+        float                   dark_masking    # darkness masking (0-> disabled)
+        
+        int                     slice_count     # slice count
+        int                     prediction_method # see FF_PRED_*
+        int                     *slice_offset   # slice offsets in the frame in bytes
+        
+        AVRational              sample_aspect_ratio  # sample aspect ratio (0 if unknown)
+        
+        int                     me_cmp          # motion estimation comparison function
+        int                     me_sub_cmp      # subpixel motion estimation comparison function
+        int                     mb_cmp          # macroblock comparison function (not supported yet)
+        int                     ildct_cmp       # interlaced DCT comparison function, see FF_CMP_*
+        int                     dia_size        # ME diamond size & shape
+        int                     last_predictor_count # amount of previous MV predictors (2a+1 x 2a+1 square)
+        
+        int                     pre_me          # prepass for motion estimation
+        int                     me_pre_cmp      # motion estimation prepass comparison function
+        int                     pre_dia_size    # ME prepass diamond size & shape
+        int                     me_subpel_quality # subpel ME quality
+        
+        # deprecated, will be removed in major 57
+        int                     dtg_active_format # DTG active format information, see FF_DTG_AFD_*
+
+        int                     me_range        # maximum motion estimation search range in subpel units, if 0 then no limit
+        
+        int                     intra_quant_bias # intra quantizer bias
+        int                     inter_quant_bias # inter quantizer bias
+        
+        int                     slice_flags     # slice flags, see SLICE_FLAG_*
+        
+        # deprecated, will be removed in major 55 or 57
+        int                     xvmc_acceleration
+        
+        int                     mb_decision     # macroblock decision mode, see FF_MB_DECISION_*
+        
+        uint16_t                *intra_matrix   # custom intra quantization matrix
+        uint16_t                *inter_matrix   # custom inter quantization matrix
+        
+        int                     scenechange_threshold # scene change detection threshold, 0 is default, larger means fewer detected scene changes
+        
+        int                     noise_reduction # noise reduction strength
+    
+        # deprecated, will be removed in major 59
+        int                     me_threshold    # unused
+        # deprecated, will be removed in major 59
+        int                     mb_threshold    # unused
+
+        int                     intra_dc_precision # precision of the intra DC coefficient - 8
+        
+        int                     skip_top        # Number of macroblock rows at the top which are skipped
+        int                     skip_bottom     # Number of macroblock rows at the bottom which are skipped
+        
+        # deprecated, will be removed in major 59
+        float                   border_masking  # use encoder private options instead
+
+        int                     mb_lmin         # minimum MB lagrange multipler
+        int                     mb_lmax         # maximum MB lagrange multipler
+        int                     me_penalty_compensation
+        int                     bidir_refine
+        int                     brd_scale
+        
+        int                     keyint_min      # minimum GOP size
+        
+        int                     refs            # number of reference frames
+        
+        int                     chromaoffset    # chroma qp offset from luma
+        
+        # deprecated, will be removed in major 57        
+        int                     scenechange_factor
+        
+        int                     mv0_threshold   # Note: Value depends upon the compare function used for fullpel ME
+        
+        int                     b_sensitivity   # Adjust sensitivity of b_frame_strategy 1
+        
+        AVColorPrimaries        color_primaries # Chromaticity coordinates of the source primaries
+        AVColorTransferCharacteristic color_trc # Color Transfer Characteristic
+        AVColorSpace            colorspace      # YUV colorspace type
+        AVColorRange            color_range     # MPEG vs JPEG YUV range
+        AVChromaLocation        chroma_sample_location # location of chroma samples
+        
+        int                     slices          # Number of slices
+        
+        AVFieldOrder            field_order
+        
+        # audio only
+        int                     sample_rate     # samples per second
+        int                     channels        # number of audio channels
+        AVSampleFormat          sample_fmt      # audio sample format
+        int                     frame_size      # Number of samples per channel in an audio frame
+        int                     frame_number    # Frame counter
+        int                     block_align     # number of bytes per packet if constant and known or 0
+        
+        int                     cutoff          # Audio cutoff bandwidth (0 means "automatic")
+        
+        # deprecated, will be removed in major 57
+        int                     request_channels
+        
+        uint64_t                channel_layout  # Audio channel layout
+        uint64_t                request_channel_layout # Request decoder to use this channel layout if it can (0 for default)
+        AVAudioServiceType      audio_service_type # Type of service that the audio stream conveys
+        AVSampleFormat          request_sample_fmt # desired sample format
+        
+        # BEGIN deprecated, will be removed in major 57
+        int (*get_buffer)(AVCodecContext *c, AVFrame *pic)
+        void (*release_buffer)(AVCodecContext *c, AVFrame *pic)
+        int (*reget_buffer)(AVCodecContext *c, AVFrame *pic)
+        # END deprecated, will be removed in major 57
+        
+        int (*get_buffer2)(AVCodecContext *s, AVFrame *frame, int flags)
+        int                     refcounted_frames # If non-zero, the decoded audio and video frames returned from ...
+        float                   qcompress       # amount of qscale change between easy & hard scenes (0.0-1.0)
+        float                   qblur           # amount of qscale smoothing over time (0.0-1.0)
+        int                     qmin            # minimum quantizer
+        int                     qmax            # maximum quantizer
+        int                     max_qdiff       # maximum quantizer difference between frames
+        
+        # BEGIN deprecated, will be removed in major 59
+        float                   rc_qsquish
+        float                   rc_qmod_amp
+        int                     rc_qmod_freq
+        # END deprecated, will be removed in major 59
+        
+        int                     rc_buffer_size  # decoder bitstream buffer size
+        int                     rc_override_count # ratecontrol override, see RcOverride
+        RcOverride              *rc_override
+        
+        # deprecated, will be removed in major 59
+        const_char              *rc_eq
+        
+        int                     rc_max_rate     # maximum bitrate
+        int                     rc_min_rate     # minimum bitrate
+        
+        # BEGIN deprecated, will be removed in major 59
+        float                   rc_buffer_aggressivity
+        float                   rc_initial_cplx
+        # END deprecated, will be removed in major 59
+        
+        float                   rc_max_available_vbv_use # Ratecontrol attempt to use, at maximum, <value> of what can be used without an underflow.
+        float                   rc_min_vbv_overflow_use # Ratecontrol attempt to use, at least, <value> times the amount needed to prevent a vbv overflow.
+        int                     rc_initial_buffer_occupancy # Number of bits which should be loaded into the rc buffer before decoding starts.
+
+        int                     coder_type # see FF_CODER_TYPE_*
+        int context_model
+        
+        # BEGIN deprecated, will be removed in major 59
+        int                     lmin
+        int                     lmax
+        # END deprecated, will be removed in major 59
+        
+        int                     frame_skip_threshold # frame skip threshold
+        int                     frame_skip_factor # frame skip factor
+        int                     frame_skip_exp  # frame skip exponent
+        int                     frame_skip_cmp  # frame skip comparison function
+        int                     trellis         # trellis RD quantization
+        int                     min_prediction_order
+        int                     max_prediction_order
+        
+        int64_t                 timecode_frame_start # GOP timecode frame start number
+        
+        void (*rtp_callback)(AVCodecContext *avctx, void *data, int size, int mb_nb)
+        int                     rtp_payload_size # The size of the RTP payload
+        
+        # statistics, used for 2-pass encoding 
+        int                     mv_bits
+        int                     header_bits
+        int                     i_tex_bits
+        int                     p_tex_bits
+        int                     i_count
+        int                     p_count
+        int                     skip_count
+        int                     misc_bits
+        
+        int                     frame_bits      # number of bits used for the previously encoded frame
+        
+        char                    *stats_out      # pass1 encoding statistics output buffer
+        
+        int                     workaround_bugs # Work around bugs in encoders which sometimes cannot be detected automatically, see FF_BUG_*
+        int                     strict_std_compliance # strictly follow the standard, see FF_COMPLIANCE_*
+        int                     error_concealment # error concealment flags, see FF_EC_*
+        
+        int                     debug           # see FF_DEBUG_*
+        
+        # deprecated, will be removed in major 57
+        int                     debug_mv        # Code outside libavcodec should access this field using AVOptions, previsouly used FF_DEBUG_VIS_MV_*
+        
+        int                     err_recognition # Error recognition; may misdetect some more or less valid parts as errors, see AV_EF_*
+        
+        int64_t                 reordered_opaque # opaque 64bit number (generally a PTS)
+        
+        AVHWAccel               *hwaccel        # Hardware accelerator in use
+        void                    *hwaccel_context
+        
+        uint64_t                error[AV_NUM_DATA_POINTERS] # encoding error, if if flags&CODEC_FLAG_PSNR set
+        
+        int                     dct_algo        # DCT algorithm, see FF_DCT_*
+        int                     idct_algo       # IDCT algorithm, see FF_IDCT_*
+        
+        int                     bits_per_coded_sample # bits per sample/pixel from the demuxer (needed for huffyuv)
+        int                     bits_per_raw_sample # Bits per sample/pixel of internal libavcodec pixel/sample format
+        
+        # deprecated, will be removed in major 57
+        int                     lowres          # use instead av_codec_{get,set}_lowres(avctx)
+        
+        AVFrame                 *coded_frame    # the picture in the bitstream
+        
+        int                     thread_count    # thread count
+        int                     thread_type     # Which multithreading methods to use, see FF_THREAD_*
+        
+        int                     active_thread_type # Which multithreading methods are in use by the codec
+        int                     thread_safe_callbacks  
+        
+        # he codec may call this to execute several independent things
+        int (*execute)(AVCodecContext *c, int (*func)(AVCodecContext *c2, void *arg), void *arg2, int *ret, int count, int size)
+        int (*execute2)(AVCodecContext *c, int (*func)(AVCodecContext *c2, void *arg, int jobnr, int threadnr), void *arg2, int *ret, int count)
+        
+        # deprecated, will be removed in major 57
+        void                    *thread_opaque
+        
+        int                     nsse_weight     # noise vs. sse weight for the nsse comparison function
+        
+        int                     profile         # see FF_PROFILE_*
+        int                     level
+        
+        AVDiscard               skip_loop_filter # Skip loop filtering for selected frames
+        AVDiscard               skip_idct       # Skip IDCT/dequantization for selected frames
+        AVDiscard               skip_frame      # Skip decoding for selected frames
+        
+        uint8_t                 *subtitle_header # Header containing style information for text subtitles
+        int                     subtitle_header_size
+        
+        # deprecated, will be removed in major 57
+        int                     error_rate 
+        
+        # deprecated, will be removed in major 57
+        AVPacket                *pkt
+        
+        uint64_t                vbv_delay       # VBV delay coded in the last frame (in periods of a 27 MHz clock)
+        
+        int                     side_data_only_packets
+        
+        int                     initial_padding
+        
+        AVRational              framerate       # For codecs that store a framerate value
+        AVPixelFormat           sw_pix_fmt      # Nominal unaccelerated pixel format, see AV_PIX_FMT_xxx
+        
+        AVRational              pkt_timebase    # Timebase in which pkt_dts/pts and AVPacket.dts/pts are
+        const_AVCodecDescriptor *codec_descriptor # use av_codec_{get,set}_codec_descriptor(avctx)
+        
+        # will be used in major 57
+        #int                     lowres         # use av_codec_{get,set}_lowres(avctx)
+        
+        # Current statistics for PTS correction.
+        int64_t                 pts_correction_num_faulty_pts # Number of incorrect PTS values so far
+        int64_t                 pts_correction_num_faulty_dts # Number of incorrect DTS values so far
+        int64_t                 pts_correction_last_pts # PTS of the last frame
+        int64_t                 pts_correction_last_dts # DTS of the last frame
+        
+        char                    *sub_charenc    # Character encoding of the input subtitles file
+        int                     sub_charenc_mode # Subtitles character encoding mode, see FF_SUB_CHARENC_MODE_
+        
+        int                     skip_alpha      # Skip processing alpha if supported by codec
+        
+        int                     seek_preroll    # Number of samples to skip after a discontinuity
+        
+        # will be used in major 57
+        #int                     debug_mv    # debug motion vectors, Code outside libavcodec should access this field using AVOptions
+
+        uint16_t                *chroma_intra_matrix # custom intra quantization matrix
+        
+        uint8_t                 *dump_separator # dump format separator
+        
+        char                    *codec_whitelist # ',' separated list of allowed decoders
+        
+    struct AVPicture:
+        uint8_t *data[AV_NUM_DATA_POINTERS] #< pointers to the image data planes 
+        int linesize[AV_NUM_DATA_POINTERS] #< number of bytes per line
 
     # AVCodecParserContext.flags
     enum:
