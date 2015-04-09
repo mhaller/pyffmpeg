@@ -1225,6 +1225,13 @@ cdef extern from "libavcodec/avcodec.h":
         AV_AUDIO_SERVICE_TYPE_KARAOKE           = 8
         AV_AUDIO_SERVICE_TYPE_NB
 
+    # ok libavcodec/avcodec.h   56. 26.100
+    struct RcOverride:
+        int start_frame
+        int end_frame
+        int qscale # If this is 0 then quality_factor will be used instead
+        float quality_factor
+
     # ok libavcodec   56. 26.100
     enum AVCodecID:
         AV_CODEC_ID_NONE,
