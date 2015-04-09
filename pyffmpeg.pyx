@@ -846,6 +846,14 @@ cdef extern from "libavcodec/avcodec.h":
     ctypedef struct AVCodecDefault
     ctypedef struct AVCodecInternal
     
+    enum AVFieldOrder:
+        AV_FIELD_UNKNOWN,
+        AV_FIELD_PROGRESSIVE,
+        AV_FIELD_TT,          #< Top coded_first, top displayed first
+        AV_FIELD_BB,          #< Bottom coded first, bottom displayed first
+        AV_FIELD_TB,          #< Top coded first, bottom displayed first
+        AV_FIELD_BT,          #< Bottom coded first, top displayed first
+    
     # use an unamed enum for defines
     cdef enum:
         CODEC_FLAG_QSCALE               = 0x0002  #< Use fixed qscale.
