@@ -1150,8 +1150,8 @@ cdef extern from "libavcodec/avcodec.h":
         AV_CODEC_ID_PCM_S24LE_PLANAR= 0x18505350, # MKBETAG(24,'P','S','P')
         AV_CODEC_ID_PCM_S32LE_PLANAR= 0x20505350, # MKBETAG(32,'P','S','P')
         AV_CODEC_ID_PCM_S16BE_PLANAR= 0x50535010, # MKBETAG('P','S','P',16)
-       
-         # various ADPCM codecs 
+
+        # various ADPCM codecs 
         AV_CODEC_ID_ADPCM_IMA_QT = 0x11000,
         AV_CODEC_ID_ADPCM_IMA_WAV,
         AV_CODEC_ID_ADPCM_IMA_DK3,
