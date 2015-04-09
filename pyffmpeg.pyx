@@ -118,11 +118,11 @@ cdef extern from "libavutil/pixfmt.h":
         AV_PIX_FMT_YUVJ420P,  #< planar YUV 4:2:0, 12bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV420P and setting color_range
         AV_PIX_FMT_YUVJ422P,  #< planar YUV 4:2:2, 16bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV422P and setting color_range
         AV_PIX_FMT_YUVJ444P,  #< planar YUV 4:4:4, 24bpp, full scale (JPEG), deprecated in favor of PIX_FMT_YUV444P and setting color_range
-    #if FF_API_XVMC
-        AV_PIX_FMT_XVMC_MPEG2_MC,///< XVideo Motion Acceleration via common packet passing
+    # if FF_API_XVMC
+    # deprecated, will be removed in major 55
+        AV_PIX_FMT_XVMC_MPEG2_MC, #< XVideo Motion Acceleration via common packet passing
         AV_PIX_FMT_XVMC_MPEG2_IDCT,
-    #define AV_PIX_FMT_XVMC AV_PIX_FMT_XVMC_MPEG2_IDCT
-    #endif /* FF_API_XVMC */
+    # endif /* FF_API_XVMC */
         AV_PIX_FMT_UYVY422,   #< packed YUV 4:2:2, 16bpp, Cb Y0 Cr Y1
         AV_PIX_FMT_UYYVYY411, #< packed YUV 4:1:1, 12bpp, Cb Y0 Y1 Cr Y2 Y3
         AV_PIX_FMT_BGR8,      #< packed RGB 3:3:2,  8bpp, (msb)2B 3G 3R(lsb)
@@ -144,13 +144,14 @@ cdef extern from "libavutil/pixfmt.h":
         AV_PIX_FMT_YUV440P,   #< planar YUV 4:4:0 (1 Cr & Cb sample per 1x2 Y samples)
         AV_PIX_FMT_YUVJ440P,  #< planar YUV 4:4:0 full scale (JPEG), deprecated in favor of PIX_FMT_YUV440P and setting color_range
         AV_PIX_FMT_YUVA420P,  #< planar YUV 4:2:0, 20bpp, (1 Cr & Cb sample per 2x2 Y & A samples)
-    #if FF_API_VDPAU
+    # if FF_API_VDPAU
+    # deprecated, will be removed in major 55
         AV_PIX_FMT_VDPAU_H264,  #< H.264 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
         AV_PIX_FMT_VDPAU_MPEG1, #< MPEG-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
         AV_PIX_FMT_VDPAU_MPEG2, #< MPEG-2 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
         AV_PIX_FMT_VDPAU_WMV3,  #< WMV3 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
         AV_PIX_FMT_VDPAU_VC1,   #< VC-1 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
-    #endif
+    # endif
         AV_PIX_FMT_RGB48BE,   #< packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, the 2-byte value for each R/G/B component is stored as big-endian
         AV_PIX_FMT_RGB48LE,   #< packed RGB 16:16:16, 48bpp, 16R, 16G, 16B, the 2-byte value for each R/G/B component is stored as little-endian
 
