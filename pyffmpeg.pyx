@@ -842,6 +842,10 @@ cdef extern from "libavutil/frame.h":
 ##################################################################################
 # ok libavcodec   56. 26.100
 cdef extern from "libavcodec/avcodec.h":
+    
+    ctypedef struct AVCodecDefault
+    ctypedef struct AVCodecInternal
+    
     # use an unamed enum for defines
     cdef enum:
         CODEC_FLAG_QSCALE               = 0x0002  #< Use fixed qscale.
