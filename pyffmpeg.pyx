@@ -96,6 +96,15 @@ cdef extern from "libavutil/mem.h":
     void *av_realloc(void * ptr, size_t size)
     void av_free(void *ptr)
     void av_freep(void *ptr)
+
+
+##################################################################################
+# ok libavutil    54. 20.100
+cdef extern from "libavutil/rational.h":
+    struct AVRational:
+        int num                    #< numerator
+        int den                    #< denominator
+
     
     
 ##################################################################################
@@ -436,14 +445,6 @@ cdef extern from "libavutil/samplefmt.h":
         AV_SAMPLE_FMT_DBLP,        #< double, planar
 
         AV_SAMPLE_FMT_NB           #< Number of sample formats. DO NOT USE if linking dynamically
-
-
-##################################################################################
-# ok libavutil    54. 20.100
-cdef extern from "libavutil/rational.h":
-    struct AVRational:
-        int num                    #< numerator
-        int den                    #< denominator
 
 
 ##################################################################################
