@@ -1,10 +1,10 @@
 Metadata-Version: 1.0
 Name: pyffmpeg
-Version: 2.2alpha
+Version: 2.3.0
 Summary: Python wrapper for FFmpeg
 Home-page: https://github.com/mhaller/pyffmpeg
 Author: Martin Haller, Bertrand Nouvel
-Author-email: martin.haller@computer.org, bertrand@lm3labs.com
+Author-email: martin@h4ll3r.net, bertrand@lm3labs.com
 License: LGPL 3.0
 Description: Python wrapper for FFmpeg 
 Platform: ALL
