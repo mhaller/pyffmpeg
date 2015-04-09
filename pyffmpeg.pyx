@@ -569,12 +569,13 @@ cdef extern from "libavutil/frame.h":
         AVDictionary *metadata
 
     struct AVFrame:
-        uint8_t *data[8]                     c#< pointer to the picture planes
+        uint8_t *data[8]                     #< pointer to the picture planes
         int linesize[8]                      #< For video, size in bytes of each picture line.
         uint8_t **extended_data              #< pointers to the data planes/channels.
-        int width, height;                   #< width and height of the video frame
-        int nb_samples;                      #< number of audio samples (per channel) described by this frame
-        int format;                          #< format of the frame, -1 if unknown or unset, Values correspond to enum AVPixelFormat for video frames, enum AVSampleFormat for audio)
+        int width                            #< width of the video frame
+        int height                           #< height of the video frame
+        int nb_samples                       #< number of audio samples (per channel) described by this frame
+        int format                           #< format of the frame, -1 if unknown or unset, Values correspond to enum AVPixelFormat for video frames, enum AVSampleFormat for audio)
         int key_frame                        #< 1 -> keyframe, 0-> not
         AVPictureType pict_type              #< AVPicture type of the frame, see ?_TYPE below
 
