@@ -2624,28 +2624,20 @@ cdef extern from "libavformat/avformat.h":
     AVInputFormat *av_find_input_format(char *short_name)
 
     # * Guess the file format.
-    # *
-    # * @param is_opened Whether the file is already opened; determines whether
-    # *                  demuxers with or without AVFMT_NOFILE are probed.
     AVInputFormat *av_probe_input_format(AVProbeData *pd, int is_opened)
 
     # * Guess the file format.
-    # *
-    # * @param is_opened Whether the file is already opened; determines whether
-    # *                  demuxers with or without AVFMT_NOFILE are probed.
-    # * @param score_max A probe score larger that this is required to accept a
-    # *                  detection, the variable is set to the actual detection
-    # *                  score afterwards.
-    # *                  If the score is <= AVPROBE_SCORE_MAX / 4 it is recommended
-    # *                  to retry with a larger probe buffer.
     AVInputFormat *av_probe_input_format2(AVProbeData *pd, int is_opened, int *score_max)
 
+
+    # FIXME: not available anymore 
     # * Allocate all the structures needed to read an input stream.
     # *        This does not open the needed codecs for decoding the stream[s].
-    int av_open_input_stream(AVFormatContext **ic_ptr,
-                         AVIOContext *pb, char *filename,
-                         AVInputFormat *fmt, AVFormatParameters *ap)
+    #int av_open_input_stream(AVFormatContext **ic_ptr,
+    #                     AVIOContext *pb, char *filename,
+    #                     AVInputFormat *fmt, AVFormatParameters *ap)
 
+    # FIXME: not available anymore 
     # * Open a media file as input. The codecs are not opened. Only the file
     # * header (if present) is read.
     # *
@@ -2656,9 +2648,58 @@ cdef extern from "libavformat/avformat.h":
     # * @param ap Additional parameters needed when opening the file
     # *           (NULL if default).
     # * @return 0 if OK, AVERROR_xxx otherwise
-    int av_open_input_file(AVFormatContext **ic_ptr, char *filename,
-                       AVInputFormat *fmt, int buf_size,
-                       AVFormatParameters *ap)
+    #int av_open_input_file(AVFormatContext **ic_ptr, char *filename,
+    #                   AVInputFormat *fmt, int buf_size,
+    #                   AVFormatParameters *ap)
+
+    # Open an input stream and read the header. The codecs are not opened.
+    # The stream must be closed with avformat_close_input().
+    #
+    # @param ps Pointer to user-supplied AVFormatContext (allocated by avformat_alloc_context).
+    #           May be a pointer to NULL, in which case an AVFormatContext is allocated by this
+    #           function and written into ps.
+    #           Note that a user-supplied AVFormatContext will be freed on failure.
+    # @param filename Name of the stream to open.
+    # @param fmt If non-NULL, this parameter forces a specific input format.
+    #            Otherwise the format is autodetected.
+    # @param options  A dictionary filled with AVFormatContext and demuxer-private options.
+    #                 On return this parameter will be destroyed and replaced with a dict containing
+    #                 options that were not found. May be NULL.
+    #
+    # @return 0 on success, a negative AVERROR on failure.
+    #
+    # @section lavf_decoding_open Opening a media file
+    # The minimum information required to open a file is its URL or filename, which
+    # is passed to avformat_open_input(), as in the following code:
+    # @code
+    # const char    *url = "in.mp3";
+    # AVFormatContext *s = NULL;
+    # int ret = avformat_open_input(&s, url, NULL, NULL);
+    # if (ret < 0)
+    #     abort();
+    # @endcode
+    int avformat_open_input(AVFormatContext **ps, char *filename, AVInputFormat *fmt, AVDictionary **options)
+
+    # Read packets of a media file to get stream information. This
+    # is useful for file formats with no headers such as MPEG. This
+    # function also computes the real framerate in case of MPEG-2 repeat
+    # frame mode.
+    # The logical file position is not changed by this function;
+    # examined packets may be buffered for later processing.
+    #
+    # @param ic media file handle
+    # @param options  If non-NULL, an ic.nb_streams long array of pointers to
+    #                 dictionaries, where i-th member contains options for
+    #                 codec corresponding to i-th stream.
+    #                 On return each dictionary will be filled with options that were not found.
+    # @return >=0 if OK, AVERROR_xxx on error
+    #
+    # @note this function isn't guaranteed to open all the codecs, so
+    #       options being non-empty at return is a perfectly normal behavior.
+    #
+    # @todo Let the user decide somehow what information is needed so that
+    #       we do not waste time getting stuff the user does not need.
+    int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
 
     # * Read packets of a media file to get stream information. This
     # * is useful for file formats with no headers such as MPEG. This
@@ -2671,7 +2712,8 @@ cdef extern from "libavformat/avformat.h":
     # * @return >=0 if OK, AVERROR_xxx on error
     # * @todo Let the user decide somehow what information is needed so that
     # *       we do not waste time getting stuff the user does not need.
-    int av_find_stream_info(AVFormatContext *ic)
+    #int av_find_stream_info(AVFormatContext *ic)
+    # FIXME: use avformat_find_stream_info() instead 
     
     # * Read a transport packet from a media file.
     # *
@@ -2681,41 +2723,44 @@ cdef extern from "libavformat/avformat.h":
     # * @param s media file handle
     # * @param pkt is filled
     # * @return 0 if OK, AVERROR_xxx on error
-    int av_read_packet(AVFormatContext *s, AVPacket *pkt)
+    #int av_read_packet(AVFormatContext *s, AVPacket *pkt)
+    # FIXME: not available anymore
  
-    # * Return the next frame of a stream.
-    # * This function returns what is stored in the file, and does not validate
-    # * that what is there are valid frames for the decoder. It will split what is
-    # * stored in the file into frames and return one for each call. It will not
-    # * omit invalid data between valid frames so as to give the decoder the maximum
-    # * information possible for decoding.
-    # *
-    # * The returned packet is valid
-    # * until the next av_read_frame() or until av_close_input_file() and
-    # * must be freed with av_free_packet. For video, the packet contains
-    # * exactly one frame. For audio, it contains an integer number of
-    # * frames if each frame has a known fixed size (e.g. PCM or ADPCM
-    # * data). If the audio frames have a variable size (e.g. MPEG audio),
-    # * then it contains one frame.
-    # *
-    # * pkt->pts, pkt->dts and pkt->duration are always set to correct
-    # * values in AVStream.time_base units (and guessed if the format cannot
-    # * provide them). pkt->pts can be AV_NOPTS_VALUE if the video format
-    # * has B-frames, so it is better to rely on pkt->dts if you do not
-    # * decompress the payload.
-    # *
-    # * @return 0 if OK, < 0 on error or end of file
+    # Return the next frame of a stream.
+    # This function returns what is stored in the file, and does not validate
+    # that what is there are valid frames for the decoder. It will split what is
+    # stored in the file into frames and return one for each call. It will not
+    # omit invalid data between valid frames so as to give the decoder the maximum
+    # information possible for decoding.
+    #
+    # If pkt->buf is NULL, then the packet is valid until the next
+    # av_read_frame() or until avformat_close_input(). Otherwise the packet
+    # is valid indefinitely. In both cases the packet must be freed with
+    # av_free_packet when it is no longer needed. For video, the packet contains
+    # exactly one frame. For audio, it contains an integer number of frames if each
+    # frame has a known fixed size (e.g. PCM or ADPCM data). If the audio frames
+    # have a variable size (e.g. MPEG audio), then it contains one frame.
+    #
+    # pkt->pts, pkt->dts and pkt->duration are always set to correct
+    # values in AVStream.time_base units (and guessed if the format cannot
+    # provide them). pkt->pts can be AV_NOPTS_VALUE if the video format
+    # has B-frames, so it is better to rely on pkt->dts if you do not
+    # decompress the payload.
+    #
+    # @return 0 if OK, < 0 on error or end of file
     int av_read_frame(AVFormatContext *s, AVPacket *pkt)
     
-    # * Seek to the keyframe at timestamp.
-    # * 'timestamp' in 'stream_index'.
-    # * @param stream_index If stream_index is (-1), a default
-    # * stream is selected, and timestamp is automatically converted
-    # * from AV_TIME_BASE units to the stream specific time_base.
-    # * @param timestamp Timestamp in AVStream.time_base units
-    # *        or, if no stream is specified, in AV_TIME_BASE units.
-    # * @param flags flags which select direction and seeking mode
-    # * @return >= 0 on success
+    # Seek to the keyframe at timestamp.
+    # 'timestamp' in 'stream_index'.
+    #
+    # @param s media file handle
+    # @param stream_index If stream_index is (-1), a default
+    # stream is selected, and timestamp is automatically converted
+    # from AV_TIME_BASE units to the stream specific time_base.
+    # @param timestamp Timestamp in AVStream.time_base units
+    #        or, if no stream is specified, in AV_TIME_BASE units.
+    # @param flags flags which select direction and seeking mode
+    # @return >= 0 on success
     int av_seek_frame(AVFormatContext *s, int stream_index, int64_t timestamp,
                   int flags)
     
@@ -2729,11 +2774,17 @@ cdef extern from "libavformat/avformat.h":
     
     # * Free a AVFormatContext allocated by av_open_input_stream.
     # * @param s context to free
-    void av_close_input_stream(AVFormatContext *s)
+    #void av_close_input_stream(AVFormatContext *s)
+    # FIXME: use  avformat_close_input() instead
+    
+    # Close an opened input AVFormatContext. Free it and all its contents
+    # and set *s to NULL.
+    void avformat_close_input(AVFormatContext **s)
 
     # * Close a media file (but not its codecs).
     # * @param s media file handle
-    void av_close_input_file(AVFormatContext *s)
+    #void av_close_input_file(AVFormatContext *s)
+    # FIXME: use avformat_close_input() instead
 
     # * Add a new stream to a media file.
     # *
@@ -2743,24 +2794,19 @@ cdef extern from "libavformat/avformat.h":
     # *
     # * @param s media file handle
     # * @param id file-format-dependent stream ID
-    AVStream *av_new_stream(AVFormatContext *s, int id)
+    #AVStream *av_new_stream(AVFormatContext *s, int id)
+    # FIXME: use avformat_new_stream() instead
+    # Add a new stream to a media file
+    AVStream *avformat_new_stream(AVFormatContext *s, AVCodec *c)
     AVProgram *av_new_program(AVFormatContext *s, int id)
-
     
     int av_find_default_stream_index(AVFormatContext *s)
     
-    # * Get the index for a specific timestamp.
-    # * @param flags if AVSEEK_FLAG_BACKWARD then the returned index will correspond
-    # *                 to the timestamp which is <= the requested one, if backward
-    # *                 is 0, then it will be >=
-    # *              if AVSEEK_FLAG_ANY seek to any frame, only keyframes otherwise
-    # * @return < 0 if no such timestamp could be found
+    # Get the index for a specific timestamp.
     int av_index_search_timestamp(AVStream *st, int64_t timestamp, int flags)    
 
-    # * Add an index entry into a sorted list. Update the entry if the list
-    # * already contains it.
-    # *
-    # * @param timestamp timestamp in the time base of the given stream
+    # Add an index entry into a sorted list. Update the entry if the list
+    # already contains it.
     int av_add_index_entry(AVStream *st, int64_t pos, int64_t timestamp,
                        int size, int distance, int flags)
 
@@ -2770,18 +2816,16 @@ cdef extern from "libavformat/avformat.h":
     # * but by demuxers.
     # * @param target_ts target timestamp in the time base of the given stream
     # * @param stream_index stream number
-    int av_seek_frame_binary(AVFormatContext *s, int stream_index,
-                         int64_t target_ts, int flags)
-
+    #int av_seek_frame_binary(AVFormatContext *s, int stream_index,
+    #                     int64_t target_ts, int flags)
+    # FIXME: not available anymore
     
-    void av_dump_format(AVFormatContext *ic,
-                    int index,
-                    char *url,
-                    int is_output)
+    # Print detailed information about the input or output format
+    void av_dump_format(AVFormatContext *ic, int index, char *url, int is_output)
 
-    # * Allocate an AVFormatContext.
-    # * avformat_free_context() can be used to free the context and everything
-    # * allocated by the framework within it.
+    # Allocate an AVFormatContext.
+    # avformat_free_context() can be used to free the context and everything
+    # allocated by the framework within it.
     AVFormatContext *avformat_alloc_context()
 
 
