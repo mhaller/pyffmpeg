@@ -2270,24 +2270,19 @@ cdef extern from "libavcodec/avcodec.h":
         
 
     AVCodec *avcodec_find_decoder(AVCodecID id)
+    AVCodec *avcodec_find_decoder_by_name(const_char *name)
     
-    int avcodec_open(AVCodecContext *avctx, AVCodec *codec)
+    int avcodec_open2(AVCodecContext *avctx, AVCodec *codec, AVDictionary **options)
 
     int avcodec_close(AVCodecContext *avctx)
 
     # deprecated ... use instead avcodec_decode_video2
-    #int avcodec_decode_video(AVCodecContext *avctx, AVFrame *picture,
-    #                     int *got_picture_ptr,
-    #                     char *buf, int buf_size)
     int avcodec_decode_video2(AVCodecContext *avctx, AVFrame *picture,
                          int *got_picture_ptr,
                          AVPacket *avpkt)
                          
-    # TODO                     
-    # deprecated ... use instead avcodec_decode_audio3
-    #int avcodec_decode_audio2(AVCodecContext *avctx, #AVFrame *picture,
-    #                     int16_t * samples, int * frames,
-    #                     void *buf, int buf_size)
+    # FIXME: deprecated: avcodec_decode_audio3
+    # @TODO: USE avcodec_decode_audio4
     int avcodec_decode_audio3(AVCodecContext *avctx, int16_t *samples,
                          int *frame_size_ptr,
                          AVPacket *avpkt)
@@ -2296,18 +2291,24 @@ cdef extern from "libavcodec/avcodec.h":
                        AVPixelFormat pix_fmt, int width, int height)
     int avpicture_layout(AVPicture* src, AVPixelFormat pix_fmt, 
                          int width, int height, unsigned char *dest, int dest_size)
-
     int avpicture_get_size(AVPixelFormat pix_fmt, int width, int height)
+
     void avcodec_get_chroma_sub_sample(AVPixelFormat pix_fmt, int *h_shift, int *v_shift)
-    char *avcodec_get_pix_fmt_name(AVPixelFormat pix_fmt)
+    
+    # FIXME: not available anymore
+    #char *avcodec_get_pix_fmt_name(AVPixelFormat pix_fmt)
+    
+    # FIXME: deprecated:
     void avcodec_set_dimensions(AVCodecContext *s, int width, int height)
 
+    # FIXME: deprecated:
     AVFrame *avcodec_alloc_frame()
     
     void avcodec_flush_buffers(AVCodecContext *avctx)
 
     # Return a single letter to describe the given picture type pict_type.
-    char av_get_pict_type_char(int pict_type)
+    # FIXME: not available anymore
+    #char av_get_pict_type_char(int pict_type)
 
     # * Parse a packet.
     # *
@@ -2347,9 +2348,6 @@ cdef extern from "libavcodec/avcodec.h":
                      uint8_t *buf, int buf_size, int keyframe)
     void av_parser_close(AVCodecParserContext *s)
 
-
-    # * Free a packet.
-    # * @param pkt packet to free
     void av_free_packet(AVPacket *pkt)
 
 
