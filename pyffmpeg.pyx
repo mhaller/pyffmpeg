@@ -2395,17 +2395,18 @@ cdef extern from "libavformat/avformat.h":
         AVSEEK_FLAG_ANY      = 4 #< seek to any frame, even non-keyframes
         AVSEEK_FLAG_FRAME    = 8 #< seeking based on frame number
     
+    # ok libavformat/avformat.h     56. 25.101 
     struct AVFrac:
         int64_t val, num, den
 
+    # ok libavformat/avformat.h     56. 25.101 
     struct AVProbeData:
-        char *filename
+        const_char *filename
         unsigned char *buf
         int buf_size
+        const_char *mime_type
 
-    struct AVCodecParserContext:
-        pass
-
+    # ok libavformat/avformat.h     56. 25.101 
     struct AVIndexEntry:
         int64_t pos
         int64_t timestamp
@@ -2422,138 +2423,91 @@ cdef extern from "libavformat/avformat.h":
     struct AVCodecTag:
         pass
     
+    # ok libavformat/avformat.h     56. 25.101 
     enum AVStreamParseType:
         AVSTREAM_PARSE_NONE,
-        AVSTREAM_PARSE_FULL,       #< full parsing and repack */
-        AVSTREAM_PARSE_HEADERS,    #< Only parse headers, do not repack. */
-        AVSTREAM_PARSE_TIMESTAMPS, #< full parsing and interpolation of timestamps for frames not starting on a packet boundary */
-        AVSTREAM_PARSE_FULL_ONCE    
+        AVSTREAM_PARSE_FULL,        #< full parsing and repack */
+        AVSTREAM_PARSE_HEADERS,     #< Only parse headers, do not repack. */
+        AVSTREAM_PARSE_TIMESTAMPS,  #< full parsing and interpolation of timestamps for frames not starting on a packet boundary */
+        AVSTREAM_PARSE_FULL_ONCE,   #< full parsing and repack of the first frame only, only implemented for H.264 currently
+        AVSTREAM_PARSE_FULL_RAW = 0x57415200, # MKTAG(0,'R','A','W') 
     
+    # ok libavformat/avformat.h     56. 25.101 
     struct AVPacketList:
         AVPacket pkt
         AVPacketList *next
 
+    # ok libavformat/avformat.h     56. 25.101 
     struct AVOutputFormat:
-        char *name
-        char *long_name
-        char *mime_type
-        char *extensions
-        int priv_data_size
-        AVCodecID video_codec
-        AVCodecID audio_codec
-        int *write_header
-        int *write_packet
-        int *write_trailer
-        # can use flags: AVFMT_NOFILE, AVFMT_NEEDNUMBER, AVFMT_RAWPICTURE,
-        # AVFMT_GLOBALHEADER, AVFMT_NOTIMESTAMPS, AVFMT_VARIABLE_FPS,
-        # AVFMT_NODIMENSIONS, AVFMT_NOSTREAMS
+        const_char *name
+        const_char *long_name
+        const_char *mime_type
+        const_char *extensions
+        AVCodecID audio_codec       #< default audio codec
+        AVCodecID video_codec       #< default video codec
+        AVCodecID subtitle_codec    #< default subtitle codec
+        # * can use flags: AVFMT_NOFILE, AVFMT_NEEDNUMBER, AVFMT_RAWPICTURE,
+        # * AVFMT_GLOBALHEADER, AVFMT_NOTIMESTAMPS, AVFMT_VARIABLE_FPS,
+        # * AVFMT_NODIMENSIONS, AVFMT_NOSTREAMS, AVFMT_ALLOW_FLUSH,
+        # * AVFMT_TS_NONSTRICT
         int flags
-        int *set_parameters        
-        int *interleave_packet
         AVCodecTag **codec_tag
-        AVCodecID subtitle_codec
-        AVMetadataConv *metadata_conv
-        void *priv_class
-        AVOutputFormat *next
+        const_AVClass *priv_class
 
+    # ok libavformat/avformat.h     56. 25.101 
     struct AVInputFormat:
-        char *name            #< A comma separated list of short names for the format
-        char *long_name       #< Descriptive name for the format, meant to be more human-readable than name  
-        int priv_data_size    #< Size of private data so that it can be allocated in the wrapper    
-        char *mime_type       #< 
-        int *read_probe
-        int *read_header
-        int *read_packet
-        int *read_close
-        int *read_seek
-        int64_t *read_timestamp
+        const_char *name            #< A comma separated list of short names for the format
+        const_char *long_name       #< Descriptive name for the format, meant to be more human-readable than name  
+        # * Can use flags: AVFMT_NOFILE, AVFMT_NEEDNUMBER, AVFMT_SHOW_IDS,
+        # * AVFMT_GENERIC_INDEX, AVFMT_TS_DISCONT, AVFMT_NOBINSEARCH,
+        # * AVFMT_NOGENSEARCH, AVFMT_NO_BYTE_SEEK, AVFMT_SEEK_TO_PTS.
         int flags
-        char *extensions       #< If extensions are defined, then no probe is done
-        int value
-        int *read_play
-        int *read_pause
-        AVCodecTag **codec_tag        
-        int *read_seek2
-        AVMetadataConv *metadata_conv
-        AVInputFormat *next
+        const_char *extensions
+        AVCodecTag **codec_tag
+        const_AVClass *priv_class
+        const_char *mime_type       #< Comma-separated list of mime types
 
-
+    # ok libavformat/avformat.h     56. 25.101 
     struct AVStream:
-        int index    #/* Track index in AVFormatContext */
-        int id       #/* format specific Track id */
-        AVCodecContext *codec #/* codec context */
-        # real base frame rate of the Track.
-        # for example if the timebase is 1/90000 and all frames have either
-        # approximately 3600 or 1800 timer ticks then r_frame_rate will be 50/1
-        AVRational r_frame_rate
-        void *priv_data
-        # internal data used in av_find_stream_info()
-        int64_t first_dts # was codec_info_duration
-        AVFrac pts
-        # this is the fundamental unit of time (in seconds) in terms
-        # of which frame timestamps are represented. for fixed-fps content,
-        # timebase should be 1/framerate and timestamp increments should be
-        # identically 1.
-        AVRational time_base
-        int pts_wrap_bits # number of bits in pts (used for wrapping control)
-        # ffmpeg.c private use
-        int stream_copy   # if TRUE, just copy Track
-        AVDiscard discard       # < selects which packets can be discarded at will and dont need to be demuxed
-        # FIXME move stuff to a flags field?
-        # quality, as it has been removed from AVCodecContext and put in AVVideoFrame
-        # MN:dunno if thats the right place, for it
-        float quality
-        # decoding: position of the first frame of the component, in
-        # AV_TIME_BASE fractional seconds.
-        int64_t start_time
-        # decoding: duration of the Track, in AV_TIME_BASE fractional
-        # seconds.
-        int64_t duration
-        char language[4] # ISO 639 3-letter language code (empty string if undefined)
-        # av_read_frame() support
-        AVStreamParseType need_parsing                  # < 1.full parsing needed, 2.only parse headers dont repack
-        AVCodecParserContext *parser
-        int64_t cur_dts
-        int last_IP_duration
-        int64_t last_IP_pts
-        # av_seek_frame() support
-        AVIndexEntry *index_entries # only used if the format does not support seeking natively
-        int nb_index_entries
-        int index_entries_allocated_size
-        int64_t nb_frames                 # < number of frames in this Track if known or 0
-        int64_t unused[4+1]        
-        char *filename                  #< source filename of the stream 
-        int disposition
-        AVProbeData probe_data
-        int64_t pts_buffer[16+1]
-        AVRational sample_aspect_ratio
-        AVMetadata *metadata
-        uint8_t *cur_ptr
-        int cur_len
-        AVPacket cur_pkt
-        int64_t reference_dts
-        int probe_packets
-        AVPacketList *last_in_packet_buffer
-        AVRational avg_frame_rate        
-        int codec_info_nb_frames
-        pass
-
+        int                 index       #< stream index in AVFormatContext
+        int                 id          #< Format-specific stream ID
+        AVCodecContext      *codec      #< Codec context associated with this stream
+        void                *priv_data
+        # deprecated, will be removed in major 57
+        # IF FF_API_LAVF_FRAC
+        AVFrac              pts
+        AVRational          time_base   #< This is the fundamental unit of time (in seconds) in terms of which frame timestamps are represented
+        int64_t             start_time  #< Decoding: pts of the first frame of the stream in presentation order
+        int64_t             duration    #< Decoding: duration of the stream, in stream time base
+        int64_t             nb_frames   #< < number of frames in this stream if known or 0
+        int                 disposition #< see AV_DISPOSITION_*
+        AVDiscard           discard     #< Selects which packets can be discarded at will and do not need to be demuxed.
+        AVRational          sample_aspect_ratio #< sample aspect ratio (0 if unknown)
+        AVDictionary        *metadata
+        AVRational          avg_frame_rate #< Average framerate
+        AVPacket            attached_pic #< For streams with AV_DISPOSITION_ATTACHED_PIC disposition, this packet will contain the attached picture.
+        AVPacketSideData    *side_data  #< An array of side data that applies to the whole stream
+        int                 nb_side_data #< The number of elements in the AVStream.side_data array
+        int                 event_flags # Flags for the user to detect events happening on the stream be cleared by the user once the event has been handled, see AVSTREAM_EVENT_FLAG_*
+        
+    # ok libavformat/avformat.h     56. 25.101 
     enum:
-        # for AVFormatContext.streams
-        MAX_STREAMS = 20
-
         # for AVFormatContext.flags
-        AVFMT_FLAG_GENPTS      = 0x0001 #< Generate missing pts even if it requires parsing future frames.
-        AVFMT_FLAG_IGNIDX      = 0x0002 #< Ignore index.
-        AVFMT_FLAG_NONBLOCK    = 0x0004 #< Do not block when reading packets from input.
-        AVFMT_FLAG_IGNDTS      = 0x0008 #< Ignore DTS on frames that contain both DTS & PTS
-        AVFMT_FLAG_NOFILLIN    = 0x0010 #< Do not infer any values from other values, just return what is stored in the container
-        AVFMT_FLAG_NOPARSE     = 0x0020 #< Do not use AVParsers, you also must set AVFMT_FLAG_NOFILLIN as the fillin code works on frames and no parsing -> no frames. Also seeking to frames can not work if parsing to find frame boundaries has been disabled
-        AVFMT_FLAG_RTP_HINT    = 0x0040 #< Add RTP hinting to the output file
-
-
-    struct AVPacketList:
-        pass
+        AVFMT_FLAG_GENPTS      = 0x0001     #< Generate missing pts even if it requires parsing future frames.
+        AVFMT_FLAG_IGNIDX      = 0x0002     #< Ignore index.
+        AVFMT_FLAG_NONBLOCK    = 0x0004     #< Do not block when reading packets from input.
+        AVFMT_FLAG_IGNDTS      = 0x0008     #< Ignore DTS on frames that contain both DTS & PTS
+        AVFMT_FLAG_NOFILLIN    = 0x0010     #< Do not infer any values from other values, just return what is stored in the container
+        AVFMT_FLAG_NOPARSE     = 0x0020     #< Do not use AVParsers, you also must set AVFMT_FLAG_NOFILLIN as the fillin code works on frames and no parsing -> no frames. Also seeking to frames can not work if parsing to find frame boundaries has been disabled
+        AVFMT_FLAG_NOBUFFER    = 0x0040     #< Add RTP hinting to the output file
+        AVFMT_FLAG_CUSTOM_IO   = 0x0080     #< The caller has supplied a custom AVIOContext, don't avio_close() it.
+        AVFMT_FLAG_DISCARD_CORRUPT = 0x0100 #< Discard frames marked corrupted
+        AVFMT_FLAG_FLUSH_PACKETS   = 0x0200 #< Flush the AVIOContext every packet.
+        AVFMT_FLAG_BITEXACT        = 0x0400
+        AVFMT_FLAG_MP4A_LATM   = 0x8000     #< Enable RTP MP4A-LATM payload
+        AVFMT_FLAG_SORT_DTS    = 0x10000    #< try to interleave outputted packets by dts (using this flag can slow demuxing down)
+        AVFMT_FLAG_PRIV_OPT    = 0x20000    #< Enable use of private options by delaying codec open (this could be made default once all code is converted)
+        AVFMT_FLAG_KEEP_SIDE_DATA = 0x40000 #< Don't merge side data but keep it separate.
 
 
     struct AVProgram:
@@ -2563,77 +2517,88 @@ cdef extern from "libavformat/avformat.h":
     struct AVChapter:
         pass
 
+    
+    # ok libavformat/avformat.h     56. 25.101 
+    enum AVDurationEstimationMethod:
+        AVFMT_DURATION_FROM_PTS,    #< Duration accurately estimated from PTSes
+        AVFMT_DURATION_FROM_STREAM, #< Duration estimated from a stream with a known duration
+        AVFMT_DURATION_FROM_BITRATE #< Duration estimated from bitrate (less accurate)
+    
+    ctypedef struct AVFormatInternal
 
+    # ok libavformat/avformat.h     56. 25.101 
     struct AVFormatContext:
-        void *              av_class
-        AVInputFormat *     iformat
-        AVOutputFormat *    oformat
-        void *              priv_data
-        AVIOContext *       pb
-        unsigned int        nb_streams
-        AVStream *          streams[20]        #< MAX_STREAMS == 20
-        char                filename[1024]
-        int64_t             timestamp
-        int                 ctx_flags        #< Format-specific flags, see AVFMTCTX_xx, private data for pts handling (do not modify directly)
-        AVPacketList *      packet_buffer
-        int64_t             start_time
-        int64_t             duration
-        int64_t             file_size        # decoding: total file size. 0 if unknown
-        int                 bit_rate        # decoding: total Track bitrate in bit/s, 0 if not
+        const_AVClass       av_class
+        AVInputFormat *     iformat         # The input container format
+        AVOutputFormat *    oformat         # The output container format
+        void *              priv_data       # Format private data
+        AVIOContext *       pb              # I/O context
+        int                 ctx_flags       # stream info, see AVFMTCTX_
+        unsigned int        nb_streams      # Number of elements in AVFormatContext.streams
+        AVStream            **streams       # A list of all streams in the file
+        char                filename[1024]  # input or output filename
+        int64_t             start_time      # Position of the first frame of the component, in AV_TIME_BASE fractional seconds
+        int64_t             duration        # Duration of the stream, in AV_TIME_BASE fractional seconds
+        int                 bit_rate        # Total stream bitrate in bit/s, 0 if not available
+        unsigned int        packet_size
+        int                 max_delay
+        int                 flags           # Flags modifying the (de)muxer behaviour. A combination of AVFMT_FLAG_*
+        unsigned int        probesize       # deprecated in favor of probesize2
+        int                 max_analyze_duration # deprecated in favor of max_analyze_duration2
+        uint8_t             *key
+        int                 keylen
+        unsigned int        nb_programs
+        AVProgram           **programs
+        AVCodecID           video_codec_id  # Forced video codec_id
+        AVCodecID           audio_codec_id  # Forced audio codec_id
+        AVCodecID           subtitle_codec_id # Forced subtitle codec_id
+        unsigned int        max_index_size  # Maximum amount of memory in bytes to use for the index of each stream
+        unsigned int        max_picture_buffer # Maximum amount of memory in bytes to use for buffering frames
+        unsigned int        nb_chapters     # Number of chapters in AVChapter array
+        AVChapter           **chapters
+        AVDictionary        *metadata       # Metadata that applies to the whole file
+        int64_t             start_time_realtime # Start time of the stream in real world time, in microseconds since the Unix epoch
+        int                 fps_probe_size  # The number of frames used for determining the framerate in avformat_find_stream_info()
+        int                 error_recognition # Error recognition; higher values will detect more errors
+        AVIOInterruptCB     interrupt_callback # Custom interrupt callbacks for the I/O layer
+        int                 debug           # Flags to enable debugging
+        int64_t             max_interleave_delta # Maximum buffering duration for interleaving
+        int                 strict_std_compliance # Allow non-standard and experimental extension
+        int                 event_flags     # Flags for the user to detect events happening on the file
+        int                 max_ts_probe    # Maximum number of packets to read while waiting for the first timestamp
+        int                 avoid_negative_ts # Avoid negative timestamps during muxing, see AVFMT_AVOID_NEG_TS_*
+        int                 ts_id           # Transport stream id
+        int                 audio_preload   # Audio preload in microseconds
+        int                 max_chunk_duration # Max chunk time in microseconds
+        int                 max_chunk_size  # Max chunk size in bytes
+        int                 use_wallclock_as_timestamps # forces the use of wallclock timestamps as pts/dts of packets
+        int                 avio_flags      # avio flags
+        AVDurationEstimationMethod duration_estimation_method
+        int64_t             skip_initial_bytes # Skip initial bytes when opening stream
+        unsigned int        correct_ts_overflow # Correct single timestamp overflows
+        int                 seek2any        # Force seeking to any (also non key) frames
+        int                 flush_packets   # Flush the I/O context after each packet
+        int                 probe_score     # format probing score
+        int                 format_probesize # number of bytes to read maximally to identify format
+        char                *codec_whitelist # ',' separated list of allowed decoders
+        char                *format_whitelist # ',' separated list of allowed demuxers
+        AVFormatInternal    *internal       # An opaque field for libavformat internal usage
+        int                 io_repositioned # IO repositioned flag
+        AVCodec             *video_codec    # Forced video codec
+        AVCodec             *audio_codec    # Forced audio codec
+        AVCodec             *subtitle_codec # Forced subtitle codec
+        AVCodec             *data_codec     # Forced data codec
+        int                 metadata_header_padding # Number of bytes to be written as padding in a metadata header
+        void                *opaque         # User data
+        # Callback used by devices to communicate with application
+        int (*control_message_cb)(AVFormatContext *s, int type, void *data, size_t data_size)
+        int64_t             output_ts_offset # Output timestamp offset, in microseconds
+        int64_t             max_analyze_duration2 # Maximum duration (in AV_TIME_BASE units) of the data read from input in avformat_find_stream_info()
+        int64_t             probesize2      # Maximum size of the data read from input for determining the input container format
+        uint8_t             *dump_separator # dump format separator
+        AVCodecID           data_codec_id   # Forced Data codec_id
 
-        #  av_read_frame() support
-        AVStream *cur_st
-        uint8_t *cur_ptr_deprecated
-        int cur_len_deprecated
-        AVPacket cur_pkt_deprecated
-        int64_t data_offset #< offset of the first packet 
-        int index_built
-        
-        int mux_rate
-        unsigned int packet_size
-        int preload
-        int max_delay
-        int loop_output
-        int flags                         #< see AVFMT_FLAG_xxx
-        int loop_input
-        unsigned int probesize            #< decoding: size of data to probe; encoding: unused.
-        int max_analyze_duration          #<  Maximum time (in AV_TIME_BASE units) during which the input should be analyzed in av_find_stream_info()
-        uint8_t *key        
-        int keylen
-        unsigned int nb_programs
-        AVProgram **programs
-        AVCodecID video_codec_id            #< Demuxing: Set by user. Forced video codec_id
-        AVCodecID audio_codec_id            #< Demuxing: Set by user. Forced audio codec_id
-        AVCodecID subtitle_codec_id         #< Demuxing: Set by user. Forced subtitle codec_id
-        #     * Maximum amount of memory in bytes to use for the index of each stream.
-        #     * If the index exceeds this size, entries will be discarded as
-        #     * needed to maintain a smaller size. This can lead to slower or less
-        #     * accurate seeking (depends on demuxer).
-        #     * Demuxers for which a full in-memory index is mandatory will ignore
-        #     * this.
-        #     * muxing  : unused
-        #     * demuxing: set by user
-        unsigned int max_index_size
-        #     * Maximum amount of memory in bytes to use for buffering frames
-        #     * obtained from realtime capture devices.
-        unsigned int max_picture_buffer
 
-        unsigned int nb_chapters
-        AVChapter **chapters
-
-        int debug                            #< FF_FDEBUG_TS        0x0001
-
-        AVPacketList *raw_packet_buffer
-        AVPacketList *raw_packet_buffer_end
-        AVPacketList *packet_buffer_end
-        
-        AVMetadata *metadata
-        
-        int raw_packet_buffer_remaining_size
-        
-        int64_t start_time_realtime        
-        
-        
     struct AVInputFormat:
         pass
 
