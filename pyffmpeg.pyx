@@ -218,6 +218,19 @@ cdef extern from "libavutil/opt.h":
         int nb_ranges           #< Number of ranges per component
         int nb_components       #< Number of componentes
     
+    int av_opt_set         (void *obj, char *name, const char *val, int search_flags)
+    int av_opt_set_int     (void *obj, char *name, int64_t     val, int search_flags)
+    int av_opt_set_double  (void *obj, char *name, double      val, int search_flags)
+    int av_opt_set_q       (void *obj, char *name, AVRational  val, int search_flags)
+    int av_opt_set_bin     (void *obj, char *name, uint8_t *val, int size, int search_flags)
+    int av_opt_set_image_size(void *obj, char *name, int w, int h, int search_flags)
+    int av_opt_set_pixel_fmt (void *obj, char *name, AVPixelFormat fmt, int search_flags)
+    int av_opt_set_sample_fmt(void *obj, char *name, AVSampleFormat fmt, int search_flags)
+    int av_opt_set_video_rate(void *obj, char *name, AVRational val, int search_flags)
+    int av_opt_set_channel_layout(void *obj, char *name, int64_t ch_layout, int search_flags)
+    
+    
+    
 ##################################################################################
 # ok libavutil    54. 20.100
 cdef extern from "libavutil/log.h":
