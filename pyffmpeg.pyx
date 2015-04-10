@@ -692,6 +692,9 @@ cdef extern from "libavformat/avio.h":
 
     int avio_open(AVIOContext **s, char *url, int flags)    
     int avio_close(AVIOContext *s)
+    
+    # Force flushing of buffered data
+    void avio_flush(AVIOContext *s)
 
     int avio_read(AVIOContext *s, unsigned char *buf, int size)
     # fseek() equivalent for AVIOContext
@@ -2798,6 +2801,9 @@ cdef extern from "libavformat/avformat.h":
     int av_seek_frame(AVFormatContext *s, int stream_index, int64_t timestamp,
                   int flags)
     
+    # Discard all internally buffered data
+    int avformat_flush(AVFormatContext *s)
+    
     # * Start playing a network-based stream (e.g. RTSP stream) at the
     # * current position.
     int av_read_play(AVFormatContext *s)
@@ -2861,6 +2867,8 @@ cdef extern from "libavformat/avformat.h":
     # avformat_free_context() can be used to free the context and everything
     # allocated by the framework within it.
     AVFormatContext *avformat_alloc_context()
+
+    AVCodecParserContext *av_stream_get_parser(AVStream *s)
 
 
 ##################################################################################
@@ -2941,23 +2949,21 @@ AVFMT_NOFILE = 1
 cdef av_read_frame_flush(AVFormatContext *s):
     cdef AVStream *st
     cdef int i
-    #flush_packet_queue(s);
-    if (s.cur_st) :
-        #if (s.cur_st.parser):
-        #    av_free_packet(&s.cur_st.cur_pkt)
-        s.cur_st = NULL
-
-    #s.cur_st.cur_ptr = NULL;
-    #s.cur_st.cur_len = 0;
-
-    for i in range(s.nb_streams) :
+    cdef AVCodecParserContext *pc
+    
+    # flush the I/O context
+    avio_flush(s.pb)
+    # discard all internally buffered data
+    avformat_flush(s)
+    
+    for i in range(s.nb_streams):
         st = s.streams[i]
-
-        if (st.parser) :
-            av_parser_close(st.parser)
-            st.parser = NULL
-            st.last_IP_pts = AV_NOPTS_VALUE
-            st.cur_dts = 0
+        pc = av_stream_get_parser(st)
+        if (pc):
+            av_parser_close(pc)
+            pc.parser = NULL
+            #st.last_IP_pts = AV_NOPTS_VALUE
+            #st.cur_dts = 0
 
 # originally defined in mpegvideo.h
 def IS_INTRA4x4(a):
