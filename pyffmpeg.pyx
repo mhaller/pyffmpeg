@@ -3172,7 +3172,7 @@ cdef class Track:
         self.do_check_end=0
 
 
-    def init(self,observer=None, support_truncated=0,   **args):
+    def init(self, observer=None, support_truncated=0, **args):
         """ This is a private constructor
 
             It supports also the following parameted from ffmpeg
