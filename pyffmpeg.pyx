@@ -2152,6 +2152,12 @@ cdef extern from "libavcodec/avcodec.h":
         uint8_t *data[AV_NUM_DATA_POINTERS] #< pointers to the image data planes 
         int linesize[AV_NUM_DATA_POINTERS] #< number of bytes per line
 
+    enum AVPictureStructure:
+        AV_PICTURE_STRUCTURE_UNKNOWN,      #< unknown
+        AV_PICTURE_STRUCTURE_TOP_FIELD,    #< coded as top field
+        AV_PICTURE_STRUCTURE_BOTTOM_FIELD, #< coded as bottom field
+        AV_PICTURE_STRUCTURE_FRAME,        #< coded as frame        
+
     # AVCodecParserContext.flags
     enum:
         PARSER_FLAG_COMPLETE_FRAMES          = 0x0001
