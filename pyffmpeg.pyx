@@ -2986,6 +2986,8 @@ except:
 # Initialization
 ##################################################################################
 
+# Initialize libavformat and register all the muxers, demuxers and
+# protocols
 cdef __registered
 __registered = 0
 if not __registered:
