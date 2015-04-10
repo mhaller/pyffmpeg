@@ -6,9 +6,25 @@ def param_convert(a):
 		comment = str(a)
 	return a, comment
 
+def MKTAG(a,b,c,d):
+	'''
+	from libavutil/common.h
+	'''
+	comment = "MKTAG("
+	a,_comment = param_convert(a)
+	comment += _comment + ','
+	b,_comment = param_convert(b)
+	comment += _comment + ','
+	c,_comment = param_convert(c)
+	comment += _comment + ','
+	d,_comment = param_convert(d)
+	comment += _comment + ')'
+	
+	return ((a) | ((b) << 8) | ((c) << 16) | ((d) << 24)), comment
+
 def MKBETAG(a,b,c,d):
 	'''
-	libavutil/common.h
+	from libavutil/common.h
 	'''
 	comment = "MKBETAG("
 	a,_comment = param_convert(a)
@@ -122,6 +138,10 @@ def main():
 	print "AV_OPT_TYPE_DURATION   = 0x%x, # %s" % MKBETAG('D','U','R',' ')
 	print "AV_OPT_TYPE_COLOR	  = 0x%x, # %s" % MKBETAG('C','O','L','R')
 	print "AV_OPT_TYPE_CHANNEL_LAYOUT = 0x%x, # %s" % MKBETAG('C','H','L','A')
+
+	print 80*"-"
+	
+	print "AVSTREAM_PARSE_FULL_RAW = 0x%x, # %s" % MKTAG(0,'R','A','W')
 
 
 if __name__ == "__main__":
