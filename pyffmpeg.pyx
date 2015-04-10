@@ -3115,6 +3115,7 @@ cdef class Track:
     ## cdef AVFormatContext *FormatCtx
     cdef AVCodecContext *CodecCtx
     cdef AVCodec *Codec
+    cdef AVOptions *codec_options
     cdef AVFrame *frame
     cdef AVStream *stream
     cdef long start_time
@@ -3194,7 +3195,11 @@ cdef class Track:
             raise IOError("Unable to get decoder")
         if (self.Codec.capabilities & CODEC_CAP_TRUNCATED) and (self.support_truncated!=0):
             self.CodecCtx.flags = self.CodecCtx.flags | CODEC_FLAG_TRUNCATED
-        avcodec_open(self.CodecCtx, self.Codec)
+
+        # FIXME: self.codec_options allocated and to be nulled?
+        if avcodec_open2(self.CodecCtx, self.Codec, self.codec_options) < 0:
+            raise Exception("Cannot open codec")
+        
         if args.has_key("hurry_mode"):
             # discard all frames except keyframes
             self.CodecCtx.skip_loop_filter = AVDISCARD_NONKEY
