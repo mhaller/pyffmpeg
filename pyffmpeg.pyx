@@ -621,6 +621,9 @@ cdef extern from "libavutil/samplefmt.h":
 # ok libavformat  56. 25.101
 cdef extern from "libavformat/avio.h":
     
+    struct AVIOInterruptCB:
+        pass
+    
     struct AVIOContext:
         AVClass *av_class
         unsigned char *buffer  
