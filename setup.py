@@ -40,7 +40,7 @@ else:
     extra_compiler_args=[]
 
 ##################################################################################
-# Try to resove
+# Try to resolve
 # static dependencies resolution by looking into pkgconfig files
 def static_resolver(libs):
     deps = []
